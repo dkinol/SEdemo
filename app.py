@@ -11,7 +11,7 @@ app = Flask(__name__, template_folder='templates')
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'project2_485'
+app.config['MYSQL_DB'] = 'project3_485'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql.init_app(app)
 
