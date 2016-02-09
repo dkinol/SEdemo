@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <h2 class="text-center">Edit album {{ album.get_title() }}</h2>
+
+  <h2 class="text-center"> Add Photo </h2>
+  <form class="form-inline col-md-offset-3" action="{{ url_for('album.album_edit_route') }}?id={{ album.get_id() }}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="op" value="add">
+    <input type="hidden" name="albumid" value="{{album.get_id()}}">
+    <input id="file_input" type="file" name="file">
+    <button id="file_submit" type="submit" class="btn btn-primary col-md-offset-2">Add Photo</button> 
+  </form>
+  <br>
+
+  <h2 class="text-center"> Edit Album Permissions </h2>
+  <form id="access_form" class="form-inline col-md-offset-3" method="post" action="{{ url_for('album.album_edit_route') }}?id={{ album.get_id() }}">
+    <input type="hidden" name="op" value="access">
+    <input type="hidden" name="albumid" value="{{album.get_id()}}">
+    <label><input type="radio" id="album_edit_public_radio" name="access" value="public"> Public </label>
+    <label><input type="radio" id="album_edit_private_radio" name="access" value="private"> Private </label>
+    <button id="album_edit_access_submit" type="submit" class="btn btn-primary col-md-offset-2">Set Album Access</button>
+  </form>
+  <br>
+
+  <h2 class="text-center"> Grant User Access </h2>
+  <form id="access_form" class="form-inline col-md-offset-3" method="post" action="{{ url_for('album.album_edit_route') }}?id={{ album.get_id() }}">
+    <input type="hidden" name="op" value="grant">
+    <input type="hidden" name="albumid" value="{{ album.get_id() }}">
+    <input type="text" id="album_edit_grant_input" name="username">
+    <button id="album_edit_grant_submit" type="submit" class="btn btn-primary col-md-offset-2">Grant</button>
+  </form>
+  <br>
+
+  <h2 class="text-center"> Revoke User Access </h2>
+  
+  {% for username, val in album.get_permissions().iteritems() %}
+  <form id="access_form" class="form-inline col-md-offset-3" method="post" action="{{ url_for('album.album_edit_route') }}?id={{ album.get_id() }}">
+    <input type="hidden" name="op" value="revoke">
+    <input type="hidden" name="albumid" value="{{ album.get_id() }}">
+    <input type="hidden" name="username" value="{{ username}}">
+    <button id="album_edit_revoke_{{username}}" type="submit" class="btn btn-primary col-md-offset-2">Revoke: {{ username }}'s Access</button>
+  </form>
+  {% endfor %}
+  <br>
+
+  <h2 class="text-center"> View Album </h2>
+  <a href="{{ url_for('album.album_route') }}?id={{ album.get_id() }}" class="btn btn-primary col-md-offset-5">View Album</a>
+  {% if album.get_picList() == None %}
+  <h2 class="text-center">No Photos in {{album.get_title()}}!</h2>
+  {% else %}
+  <h2 class="text-center">Photos in {{ album.get_title() }}:</h2>
+  {% for pic in album.get_picList() %}
+    <div class="row">
+      <!--<div class="col-md-3 col-md-offset-3 lead"> {{pic.get_date()}} </div>-->
+      <form class="form-inline col-md-offset-3" action="{{ url_for('album.album_edit_route') }}?id={{ album.get_id() }}" method="post">
+      	<input type="hidden" name="op" value="delete" />
+	<input type="hidden" name="albumid" value="{{ album.get_id() }}">
+      	<input type="hidden" name="file" value={{pic.get_picid()}} />
+        <button id="delete_pic_{{pic.get_picid()}}" type="submit" class="btn btn-primary col-md-offset-2" > Delete </button>
+        <img src="/static/images/{{pic.get_picid()}}.{{pic.get_format()}}" width="128" height="128" >
+        <a id="pic_{{ pic.get_picid() }}_link" class="btn btn-primary" href="{{ url_for('album.pic_route') }}?id={{ pic.get_picid() }}">View</a>
+      </form>
+    </div>
+  {% endfor %}
+  {% endif %}
+
+</div>
+{% endblock %}

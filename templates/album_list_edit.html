@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <h2 class="text-center">Edit albums for {{ user.get_username() }}</h2>
+  {% for albumid, title in user.get_albumdict().iteritems() %}
+    <div class="row">
+      <!--<div class="col-md-3 col-md-offset-3 lead"> {{title}} </div>-->
+      <form action="{{ url_for('albums.albums_edit_route') }}?username={{ user.get_username() }}" method="post" >
+        <input type="hidden" name="op" value="delete">
+        <input type="hidden" name="albumid" value="{{ albumid }}">
+        <button id="delete_album_{{ albumid }}" type="submit" class="btn btn-primary col-md-offset-1">Delete</button> 
+      </form>
+      <a id="album_edit_{{ albumid }}_link" class="btn btn-primary" href="{{ url_for('album.album_edit_route') }}?id={{ albumid }}">{{ title }}</a>
+      <br>
+    </div>
+  {% endfor %}
+  <form class="form-inline col-md-offset-3" action="{{ url_for('albums.albums_edit_route') }}?username={{ user.get_username() }}" method="post">
+    <input type="hidden" name="op" value="add">
+    <input type="hidden" name="username" value="{{ user.get_username() }}">
+    <input id="album_add_name" type="text" name="title" class="form-control" placeholder="Album Name">
+    <button id="album_add_submit" type="submit" class="btn btn-primary col-md-offset-2">Add Album</button> 
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+
+  <h2 class="text-center">Public Albums for {{ name }}</h2>
+  {% for albumid, title in publicAlbums %}
+    <div class="row">
+      <!--<div class="col-md-3 col-md-offset-3 lead"> {{title}} </div>-->
+      <a id="album_{{ albumid }}_link" class="btn btn-primary col-md-offset-2" href="{{ url_for('album.album_route') }}?id={{ albumid }}">{{ title }}</a>
+    </div>
+  {% endfor %}
+    <a  class="btn btn-primary col-md-offset-3" href="{{ url_for('index.main_route') }}"> Go To Index </a>
+</div>
+{% endblock %}

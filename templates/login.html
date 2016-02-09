@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <h2 class="text-center"> Login </h2>
+  <form class="form-inline col-md-offset-3" action="{{ url_for('index.login_route') }}" method="post">
+    <input id="login_username_input" type="text" name="username" class="form-control" placeholder="Username" />
+    <input id="login_password_input" type="password" name="password" class="form-control" placeholder="Password" />
+    <button id="login_submit" type="submit" class="btn btn-primary col-md-offset-2"> Login </button> 
+  </form>
+  {% if error == 'Invalid username' %}
+  <p class="error" id="error_username">Username does not exist</p>
+  {% elif error == 'Invalid password'%}
+  <p class="error" id="error_combo">Incorrect password</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <h1>This is a view for a single album, a user cannot edit</h1>
+  {% if album.get_picList() == None %}
+  <h2 class="text-center">No Photos in {{album.get_title()}}!</h2>
+  {% else %}
+  <h2 class="text-center">Photos in {{ album.get_title() }}:</h2>
+  {% for pic in album.get_picList() %}
+    <div class="row">
+      <div class="col-md-3 col-md-offset-3 lead"> {{pic.get_date()}} </div>
+      <a id="pic_{{pic.get_picid()}}_link" class="btn btn-primary col-md-offset-2" href="{{ url_for('album.pic_route') }}?id={{ pic.get_picid() }}">View</a>
+      <img src="/static/images/{{pic.get_picid()}}.{{pic.get_format()}}" width="128" height="128" >
+    </div>
+  {% endfor %}
+  {% endif %}
+  <!--<img src="{{ url_for('static', filename='images/football_s1.jpg') }}">-->
+  <a class="btn btn-primary col-md-offset-2" href="{{ url_for('album.album_edit_route') }}?id={{ album.get_id() }}"> Edit Album </a>
+</div>
+{% endblock %}

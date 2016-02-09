@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  {% if user.get_username() == None %}
+  <h2 class="text-center">Unregistered Username</h2>
+  {% else %}
+  <h2 class="text-center">Albums for {{ user.get_username() }}</h2>
+  {% for albumid, title in user.get_albumdict().iteritems() %}
+    <div class="row">
+      <!--<div class="col-md-3 col-md-offset-3 lead"> {{title}} </div>-->
+      <a id="album_{{ albumid }}_link" class="btn btn-primary col-md-offset-2" href="{{ url_for('album.album_route') }}?id={{ albumid }}">{{ title }}</a>
+      <a class="btn btn-primary" href="{{ url_for('album.album_edit_route') }}?id={{ albumid }}"> Edit </a>
+    </div>
+  {% endfor %}
+  {% endif %}
+    <a id="user_albums_edit_{{ user.get_username() }}" class="btn btn-primary col-md-offset-3" href="{{ url_for('albums.albums_edit_route') }}"> Edit Albums </a>
+</div>
+{% endblock %}

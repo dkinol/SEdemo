@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <h2 class="text-center"> Users </h2>
+  <ul>
+  {% for username in userlist %}
+    <li>
+    <!--<div class="lead col-md-3 col-md-offset-3 leads">{{ username }}</div>-->
+    <a id="user_albums_{{username[0]}}" class="btn btn-primary col-md-offset-2" href="{{ url_for('albums.albums_route') }}?username={{ username[0] }}">{{ username[1] + ' ' + username[2] }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}

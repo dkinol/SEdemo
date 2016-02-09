@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+  <h2 class="text-center"> View Albums: </h2>
+  {% for albumid, title in albums %}
+    <div class="row">
+      <a id="album_{{ albumid }}_link" class="btn btn-primary col-md-offset-2" href="{{ url_for('album.album_route') }}?id={{ albumid }}">{{ title }}</a>
+    </div>
+  {% endfor %} 
+</div>
+{% endblock %}

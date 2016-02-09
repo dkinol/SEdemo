@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>485</title>
+    <meta charset="UTF-8">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="description" content="EECS 485 Project 1: group38">
+  <meta name="keywords" content="albums, photos">
+  <meta name="author" content="Brian, David, Brandon"> 
+  <link href="{{url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  </head>
+<body>
+  <header>
+    <div class="container">
+      <h2>Photo Album Website</h2>
+      {% if 'username' not in session %}
+      <a id="home_login" class="btn btn-primary" href="{{ url_for('index.login_route') }}?url={{ request.url }}"> Login </a>
+      <a id="home_user_create" class="btn btn-primary" href="{{ url_for('user.user_route') }}"> Create Account </a>
+      {% else %}
+      <div class="container">
+        <h3> Logged in as {{ session['firstname'] }} {{ session['lastname'] }}</h3>
+        <a id="nav_home" class="btn btn-primary" href="{{ url_for('index.main_route') }}">Nav Home</a>
+        <a id="nav_edit" class="btn btn-primary" href="{{ url_for('user.user_edit_route') }}">Edit Account</a>
+        <a id="nav_albums" class="btn btn-primary" href="{{ url_for('albums.albums_route') }}">My Albums</a>
+        <form class="form-inline" action="{{ url_for('index.logout_route') }}" method="post">
+          <button id="nav_logout" type="submit" class="btn btn-primary">Logout</button> 
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+  {%block body %} {% endblock %}
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</body>
+</html>
