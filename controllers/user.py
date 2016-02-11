@@ -6,33 +6,49 @@ import re
 
 user = Blueprint('user', __name__, template_folder='templates')
 
-@user.route('/user', methods=['GET', 'POST'])
-def user_route():
-	error_message = []
-	if 'username' in session:
-		return redirect(url_for('user.user_edit_route'))
+@user.route('/api/v1/user', methods=['GET', 'POST'])
+def user_api():
+	username = ''
 	if request.method == 'POST':
-		if request.form['password1'] != request.form['password2']:
-			error_message.append('Passwords do not match')
-		user = User(request.form['username'],
-			request.form['firstname'],
-			request.form['lastname'],
-			request.form['password1'],
-			request.form['email'])
-		error_message = error_message + user.validate()
-		temp_user = extensions.get_user(request.form['username'])
+		errors = []
+		req = request.get_json(force=True)
+		if req['password1'] != req['password2']:
+			errors.append('Passwords do not match')
+		user = User(req['username'],
+			req['firstname'],
+			req['lastname'],
+			req['password1'],
+			req['email'])
+		errors = errors + user.validate()
+		temp_user = extensions.get_user(req['username'])
 		if temp_user != None:
-			error_message.append('This username is taken')
-		if error_message == []:
-			user.create_salt()
-			user.hash_pass()
-			extensions.add_user(user)
-			if 'username' in session:
-				return redirect(url_for('user.user_edit_route'))
-			else:
-				return redirect(url_for('index.login_route'))
+			errors.append('This username is taken')
+		print errors
+		if errors != []:
+			print 'Should return json errors'
+			error_dict = {}
+			error_dict['errors'] = errors
+			return jsonify(error_dict)
+		user.create_salt()
+		user.hash_pass()
+		extensions.add_user(user)
+		username = req['username']
+	if username == '':
+		if 'username' not in session:
+			abort(403)
+		username = session['username']
+	user = extensions.get_user(username)
+	response = {}
+	response['username'] = user.get_username()
+	response['firstname'] = user.get_firstname()
+	response['lastname'] = user.get_lastname()
+	response['email'] = user.get_email()
+	return jsonify(response)
+	
 
-    	return render_template('user.html', error_mess = error_message) 
+@user.route('/user', methods=['GET'])
+def user_route():
+    	return render_template('user.html', error_mess = []) 
 
 @user.route('/user/edit', methods=['GET', 'POST'])
 def user_edit_route():
