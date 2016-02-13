@@ -162,11 +162,6 @@ def album_edit_route():
 	return render_template('album_edit.html', album = album, permissions=album.get_permissions())
 
 
-@album.route('api/v1/album/edit', methods=['GET', 'POST'])
-def album_edit_route_api():
-	
-
-	return 'my dick'
 
 
 
