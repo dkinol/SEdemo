@@ -4,6 +4,7 @@ from werkzeug import secure_filename
 from objects.Photo import Photo
 from objects.Album import Album
 import os
+import re
 
 album = Blueprint('album', __name__, template_folder='templates')
 
@@ -41,7 +42,7 @@ def pic_route():
 			return redirect(url_for('index.login_route') + '?url=' + url_for('album.pic_route') + '?id=' + pic)
 		elif photo.has_access(session['username']):
 			edit = (photo.get_username_owner() == session['username'])
-			print 'Edit: ' + edit
+			#print 'Edit: ' + edit
 			return render_template('full_pic.html', photo = photo, edit = edit)
 		else:
 			abort(403)
@@ -51,6 +52,71 @@ def pic_route():
 			return render_template('full_pic.html', photo = photo, edit = True)
 
 	return render_template('full_pic.html', photo = photo, edit = False)
+
+@album.route('/api/v1/pic', methods=['GET', 'PUT'])
+def pic_api():
+	response = {}
+	pic = request.args.get('id')
+	photo = extensions.get_photo(pic)
+	response['albumid'] = photo.get_albumID()
+	response['caption'] = photo.get_caption()
+	response['format'] = photo.get_format()
+	response['next'] = photo.get_nextID()
+	response['picid'] = pic
+	response['prev'] = photo.get_prevID()
+	if request.method == 'GET':
+		if photo.is_private():
+			if 'username' not in session: 
+				return redirect(url_for('index.login_route') + 
+					'?url=' + url_for('album.pic_route') + '?id=' + pic)
+			elif photo.has_access(session['username']):
+				return jsonify(response)
+			else:
+				abort(403)
+		if 'username' in session:
+			if photo.get_username_owner() == session['username']:
+				return jsonify(response)
+	if request.method == 'PUT':
+		if 'username' in session:
+			req = request.get_json(force=True)
+			if photo.get_username_owner() == session['username']:
+					extensions.update_photo_caption(req['picid'], req['caption'])
+					photo = extensions.get_photo(pic)
+		abort(403)
+
+	return jsonify(response)
+
+@album.route('/api/v1/album',methods=['GET'])
+def album_api():
+	albumname = request.args.get('id')
+	album = extensions.get_album(albumname)
+	response = {}
+	picLis = []
+	if request.method == 'GET':
+		for photo in album.get_picList():
+			thisPic = {}
+			thisPic['albumid'] = photo.get_albumID()
+			thisPic['caption'] = photo.get_caption()
+			thisPic['format'] = photo.get_format()
+			thisPic['next'] = photo.get_nextID()
+			thisPic['picid'] = photo.get_picid()
+			thisPic['prev'] = photo.get_prevID()
+			picLis.append(thisPic)
+		if album.is_private() == True:
+			response['access'] = 'private'
+		else :
+			response['access'] = 'public'
+		response['albumid'] = album.get_id()
+		response['created'] = str(album.get_created())
+		response['lastupdated'] = str(album.get_lastUpdated())
+		response['pics'] = picLis
+		response['title'] = album.get_title()
+		response['username'] = album.get_username()
+	elif request.method == 'POST':
+		req = request.get_json(force=True)
+		#not sure what to do with retrived data
+	return jsonify(response)
+
 
 @album.route('/album/edit', methods=['GET', 'POST'])
 def album_edit_route():
@@ -94,4 +160,18 @@ def album_edit_route():
 	albumname = request.args.get('id')
 	album = extensions.get_album(albumname)
 	return render_template('album_edit.html', album = album, permissions=album.get_permissions())
+
+
+@album.route('api/v1/album/edit', methods=['GET', 'POST'])
+def album_edit_route_api():
+	
+
+	return 'my dick'
+
+
+
+
+
+
+
 
