@@ -17,6 +17,23 @@ def main_route():
 	return render_template("homepage.html", albums=albums)	
 
 
+@index.route('/api/v1/login', methods=['POST',])
+def login_api():
+	req = request.get_json(force=True)
+	errors = []
+	user = extensions.get_user(req['username'])
+	if user == None:
+		errors.append('Invalid username')
+	user_pass = req['password']
+	if user.check_pass(user_pass):
+		session['username'] = user.get_username()
+		session['firstname'] = user.get_firstname()
+		session['lastname'] = user.get_lastname()
+		result = {}
+		result['username'] = user.get_username()
+		return jsonify(result)
+	errors.append('Invalid password')
+	return jsonify(errors)
 
 @index.route('/login', methods=['GET', 'POST'])
 def login_route():
@@ -47,6 +64,13 @@ def login_route():
 			return render_template('login.html', error='Invalid password')
 	return render_template("login.html")
 
+@index.route('/api/v1/logout', methods=['POST'])
+def logout_api():
+	session.pop('username', None)
+	session.pop('firstname', None)
+	session.pop('lastname', None)
+	return ('', 204)
+	
 
 @index.route('/logout', methods=['POST'])
 def logout_route():
