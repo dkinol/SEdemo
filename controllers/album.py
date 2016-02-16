@@ -29,6 +29,7 @@ def pic_route():
 	pic = request.args.get('id')
 	photo = extensions.get_photo(pic)
 	if request.method == 'POST':
+		print 'BAD'
 		if 'username' in session:
 			if photo.get_username_owner() == session['username']:
 				if request.form['op'] == 'caption':
@@ -55,16 +56,23 @@ def pic_route():
 
 @album.route('/api/v1/pic', methods=['GET', 'PUT'])
 def pic_api():
-	response = {}
-	pic = request.args.get('id')
-	photo = extensions.get_photo(pic)
-	response['albumid'] = photo.get_albumID()
-	response['caption'] = photo.get_caption()
-	response['format'] = photo.get_format()
-	response['next'] = photo.get_nextID()
-	response['picid'] = pic
-	response['prev'] = photo.get_prevID()
-	if request.method == 'GET':
+	pic = ''
+	if request.method == 'PUT':
+		if 'username' in session:
+			req = request.get_json(force=True)
+			pic = req['picid']
+			photo = extensions.get_photo(pic)
+			if photo.get_username_owner() == session['username']:
+					extensions.update_photo_caption(pic, req['caption'])
+	if pic != '':
+		response = {}
+		photo = extensions.get_photo(pic)
+		response['albumid'] = photo.get_albumID()
+		response['caption'] = photo.get_caption()
+		response['format'] = photo.get_format()
+		response['next'] = photo.get_nextID()
+		response['picid'] = pic
+		response['prev'] = photo.get_prevID()
 		if photo.is_private():
 			if 'username' not in session: 
 				return redirect(url_for('index.login_route') + 
@@ -76,15 +84,7 @@ def pic_api():
 		if 'username' in session:
 			if photo.get_username_owner() == session['username']:
 				return jsonify(response)
-	if request.method == 'PUT':
-		if 'username' in session:
-			req = request.get_json(force=True)
-			if photo.get_username_owner() == session['username']:
-					extensions.update_photo_caption(req['picid'], req['caption'])
-					photo = extensions.get_photo(pic)
-		abort(403)
-
-	return jsonify(response)
+	
 
 @album.route('/api/v1/album',methods=['GET'])
 def album_api():
@@ -112,9 +112,9 @@ def album_api():
 		response['pics'] = picLis
 		response['title'] = album.get_title()
 		response['username'] = album.get_username()
-	elif request.method == 'POST':
-		req = request.get_json(force=True)
-		#not sure what to do with retrived data
+	#elif request.method == 'POST':
+	#	req = request.get_json(force=True)
+	#	#not sure what to do with retrived data
 	return jsonify(response)
 
 
@@ -160,13 +160,4 @@ def album_edit_route():
 	albumname = request.args.get('id')
 	album = extensions.get_album(albumname)
 	return render_template('album_edit.html', album = album, permissions=album.get_permissions())
-
-
-
-
-
-
-
-
-
 
