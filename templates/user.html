@@ -37,18 +37,29 @@
 			password2: $("#new_password2_input").val()
 		};
 
-		$.ajax({
-			url: "{{ url_for('user.user_api') }}",
-			type: 'POST',
-			contentType: "application/json",
-			data: JSON.stringify(user_req),
-			success: function(response){
-				console.log(response);
-			},
-			error: function(e){
-				console.log(e.message);
-			}
-		});
+		errors = [];
+		validateUsername(user_req.username, errors);
+		validateFirstname(user_req.firstname, errors);
+		validateLastname(user_req.lastname, errors);
+		validateEmail(user_req.email, errors);
+		validatePassword(user_req.password1, user_req.password2, errors);
+		console.log(errors);
+
+		if (errors.length == 0){
+			console.log("Made the request to the server");
+			$.ajax({
+				url: "{{ url_for('user.user_api') }}",
+				type: 'POST',
+				contentType: "application/json",
+				data: JSON.stringify(user_req),
+				success: function(response){
+					console.log(response);
+				},
+				error: function(e){
+					console.log(e.message);
+				}
+			});
+		}
 	});
 </script>
 
