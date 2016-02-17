@@ -6,19 +6,52 @@
 <div class="btn-group_s text-center" role="group" aria-label="...">
   {% if photo.get_prevID() != None %}
   <a id="prev_pic" type="button" class="btn btn-default" href="{{ url_for('album.pic_route') }}?id={{ photo.get_prevID() }}">Previous</a>
+  {% else %}
+  <a id="prev_pic" type="button" class="btn btn-default">Previous</a>
   {% endif %}
   <a id="parent_album" type="button" class="btn btn-default" href="{{ url_for('album.album_route') }}?id={{ photo.get_albumID() }}">Return to Album</a>
   {% if photo.get_nextID() != None %}
   <a id="next_pic" type="button" class="btn btn-default" href="{{ url_for('album.pic_route') }}?id={{ photo.get_nextID() }}">Next</a>
+  {% else %}
+  <a id="next_pic" type="button" class="btn btn-default">Next</a>
   {% endif %}
 </div>
 {% if edit == True %}
-<form class="form-inline col-md-offset-3" action="{{ url_for('album.pic_route') }}?id={{ photo.get_picid() }}" method="post" enctype="multipart/form-data">
-  <input type="hidden" name="op" value="caption">
-  <input type="hidden" name="picid" value="{{photo.get_picid()}}">
+<form id="new_cap" class="form-inline col-md-offset-3">
   <input id="pic_caption_input" type="text" name="caption">
-  <button id="pic_caption_submit" type="submit" class="btn btn-primary col-md-offset-0">Change Caption</button> 
+  <button type="submit" class="btn btn-primary col-md-offset-0" id="pic_caption_submit">Change Caption</button> 
 </form>
-{% endif%}
+{% endif %}
+<script>
+  $("#new_cap").submit(function(event){
+    // Prevents the form from submitting normally
+    event.preventDefault();
+    var pic_cap = {
+      albumid: {{photo.get_albumID()}},
+      caption: $("#pic_caption_input").val(),
+      format: "{{photo.get_format() }}",
+      next: "{{photo.get_nextID() }}",
+      picid: "{{photo.get_picid() }}",
+      prev: "{{photo.get_prevID() }}"
+    };
+    $.ajax({
+      url: "{{ url_for('album.pic_api') }}",
+      type: 'PUT',
+      contentType: "application/json",
+      data: JSON.stringify(pic_cap),
+      success: function(response){
+        console.log(response);
+        $("#pic_caption_input").val("");
+        $("#pic_{{photo.get_picid()}}_caption").text(pic_cap.caption);
+      },
+      error: function(e){
+        console.log(e.message);
+      }
+    });
+  });
+</script>
+
+
+
 </div>
 {% endblock %}
