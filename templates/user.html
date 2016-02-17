@@ -23,11 +23,23 @@
   <button type="submit" class="btn btn-primary" id="new_submit">Submit</button> 
 </form>
 
+<div class="container">
+	<ul id="error_list">
+	</ul>
+</div>
+
 <script>
 	$("#new_user").submit(function(event){
 		// Prevents the form from submitting normally
 		event.preventDefault();
 
+		$("#error_list").empty();
+		function printErrors(inerrors){
+			for (i = 0; i < inerrors.length; ++i){
+				$("#error_list").append("<li><p class=error>" + inerrors[i] + "</p></li>");
+			}
+		}
+		
 		var user_req = {
 			username: $("#new_username_input").val(),
 			firstname: $("#new_firstname_input").val(),
@@ -52,19 +64,31 @@
 				type: 'POST',
 				contentType: "application/json",
 				data: JSON.stringify(user_req),
-				success: function(response){
-					console.log(response);
+				success: function(result){
+					var server_err = [];
+					if ('errors' in result){
+						for (i = 0; i < result.errors.length; ++i){
+							server_err.push(result.errors[i]);
+						}
+						printErrors(server_err);
+					}
+					else{
+						$("#new_username_input").val("");
+						$("#new_firstname_input").val("");
+						$("#new_lastname_input").val("");
+						$("#new_email_input").val("");
+						$("#new_password1_input").val("");
+						$("#new_password2_input").val("");
+					}
 				},
 				error: function(e){
 					console.log(e.message);
 				}
 			});
 		}
+		else{
+			printErrors(errors);
+		}
 	});
 </script>
-
-{% for error in error_mess %}
-<p class="error">{{ error }}</p>
-{% endfor %}
-</div>
 {% endblock %}

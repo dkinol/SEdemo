@@ -26,11 +26,22 @@
     </form>
 </div>
 
+<div class="container">
+	<ul id="error_list">
+	</ul>
+</div>
+
 <script>
 	$("#update_user").submit(function(event){
 		// Prevents the form from submitting normally
 		event.preventDefault();
 
+		$("#error_list").empty();
+		function printErrors(error_list){
+			for (i = 0; i < error_list.length; ++i){
+				$("#error_list").append("<li><p class=error>" + errors_list[i] + "</p></li>");
+			}
+		}
 		var update_req = {
 			firstname: $("#update_firstname_input").val(),
 			lastname: $("#update_lastname_input").val(),
@@ -53,13 +64,29 @@
 				type: 'PUT',
 				contentType: "application/json",
 				data: JSON.stringify(update_req),
-				success: function(response){
-					console.log(response);
+				success: function(result){
+					var server_err = [];
+					if ('errors' in result){
+						for (i = 0; i < result.errors.length; ++i){
+							server_err.push(result.errors[i]);
+						}
+						printErrors(server_err);
+					}
+					else{
+						$("#update_firstname_input").val("");
+						$("#update_lastname_input").val("");
+						$("#update_email_input").val("");
+						$("#update_password1_input").val("");
+						$("#update_password2_input").val("");
+					}
 				},
 				error: function(e){
 					console.log(e.message);
 				}
 			});
+		}
+		else{
+			printErrors(errors);
 		}
 	});
 </script>
