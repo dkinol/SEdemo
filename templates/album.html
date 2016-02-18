@@ -13,17 +13,19 @@
 	});
 
 	var Album;
+	//href=" + picbaseurl + "?id=" + picid + "
 
 	function thumb_pic_template(picid, picformat, picbaseurl){
-		return "<div class=row>" + 
-			"<a id=pic_" + picid + "_link class=btn-primary href=" + picbaseurl + "?id=" + picid + ">View</a>" +
-			"<img src=/static/images/" + picid + "." + picformat + " width=128 height=128></div>";
+		return '<div class=row>' + 
+			'<a id=pic_' + picid + '_link class="btn btn-primary" target=' + picid + '>View</a>' +
+			'<img src="/static/images/' + picid + "." + picformat + '" width=128 height=128></div>';
 	}
 
 	function displayAlbum(album){
 		$("#album_title").val(album.title);
 		for (i = 0; i < album.pics.length; ++i){
-			$("#album_list").append("<li>Picture: " + thumb_pic_template(album.pics[i].picid, album.pics[i].format, "{{ url_for('album.pic_route') }}") + "</li>");
+			var new_ele = thumb_pic_template(album.pics[i].picid, album.pics[i].format, "{{ url_for('album.pic_route') }}");
+			$("#album_list").append("<li>Picture: " + new_ele + "</li>");
 		}
 	}
 
@@ -37,6 +39,21 @@
 		}
 	});
 
+	$('body').on('click', "a[id^='pic_']", function(event){
+			// Prevents the user from following the link
+			event.preventDefault();
+			console.log("Clicked the link id: " + event.target.target);
+			var picId = event.target.target;
+			
+			$.ajax({
+				url: "{{ url_for('album.pic_api', pic='') }}" + picId,
+				type: "GET",
+				success: function(result){
+					console.log(result);
+					$("#content").empty();
+				}
+			});
+	});
 </script>
 
 {% endblock %}
