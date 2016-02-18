@@ -95,7 +95,7 @@ class User:
 		if not re.match('[^@]+@[^@]+\.[^@]+', self.__email):
 			message.append('Email address must be valid')
 		if len(self.__email) > 20:
-			message.append('Email must be no longer than 20 characters')
+			message.append('Email must be no longer than 40 characters')
 		if self.__salt == '':
 			if not re.match('^[A-Za-z0-9_]*$', self.__password):
 				message.append('Passwords may only contain letters, digits, and underscores')
