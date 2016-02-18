@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="container">
-<form action="{{ url_for('user.user_route') }}" method="post" class="col-md-offset-3 col-md-3">
+	<form id="new_user" class="col-md-offset-3 col-md-3">
   <div class="form-group">
     <input type="text" name="username" class="form-control" id="new_username_input" placeholder="username">
   </div>
@@ -22,8 +22,73 @@
   </div>
   <button type="submit" class="btn btn-primary" id="new_submit">Submit</button> 
 </form>
-{% for error in error_mess %}
-<p class="error">{{ error }}</p>
-{% endfor %}
+
+<div class="container">
+	<ul id="error_list">
+	</ul>
 </div>
+
+<script>
+	$("#new_user").submit(function(event){
+		// Prevents the form from submitting normally
+		event.preventDefault();
+
+		$("#error_list").empty();
+		function printErrors(inerrors){
+			for (i = 0; i < inerrors.length; ++i){
+				$("#error_list").append("<li><p class=error>" + inerrors[i] + "</p></li>");
+			}
+		}
+		
+		var user_req = {
+			username: $("#new_username_input").val(),
+			firstname: $("#new_firstname_input").val(),
+			lastname: $("#new_lastname_input").val(),
+			email: $("#new_email_input").val(),
+			password1: $("#new_password1_input").val(),
+			password2: $("#new_password2_input").val()
+		};
+
+		errors = [];
+		validateUsername(user_req.username, errors);
+		validateFirstname(user_req.firstname, errors);
+		validateLastname(user_req.lastname, errors);
+		validateEmail(user_req.email, errors);
+		validatePassword(user_req.password1, user_req.password2, errors);
+		console.log(errors);
+
+		if (errors.length == 0){
+			console.log("Made the request to the server");
+			$.ajax({
+				url: "{{ url_for('user.user_api') }}",
+				type: 'POST',
+				contentType: "application/json",
+				data: JSON.stringify(user_req),
+				success: function(result){
+					var server_err = [];
+					if ('errors' in result){
+						for (i = 0; i < result.errors.length; ++i){
+							server_err.push(result.errors[i]);
+						}
+						printErrors(server_err);
+					}
+					else{
+						$("#new_username_input").val("");
+						$("#new_firstname_input").val("");
+						$("#new_lastname_input").val("");
+						$("#new_email_input").val("");
+						$("#new_password1_input").val("");
+						$("#new_password2_input").val("");
+					}
+				},
+				error: function(e){
+					console.log(e.message);
+				}
+			});
+		}
+		else{
+			printErrors(errors);
+		}
+	});
+</script>
 {% endblock %}
