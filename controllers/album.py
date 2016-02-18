@@ -49,9 +49,8 @@ def pic_route():
 
 	return render_template('full_pic.html', photo = photo, edit = False)
 
-@album.route('/api/v1/pic', methods=['GET', 'PUT'])
-def pic_api():
-	pic = ''
+@album.route('/api/v1/pic/<pic>', methods=['GET', 'PUT'])
+def pic_api(pic):
 	if request.method == 'PUT':
 		if 'username' in session:
 			req = request.get_json(force=True)
@@ -76,9 +75,7 @@ def pic_api():
 				return jsonify(response)
 			else:
 				abort(403)
-		if 'username' in session:
-			if photo.get_username_owner() == session['username']:
-				return jsonify(response)
+        	return jsonify(response)
 	
 @album.route('/api/v1/album/<album_id>', methods=['GET'])
 def album_api(album_id):
