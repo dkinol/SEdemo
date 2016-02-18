@@ -69,7 +69,6 @@ def get_album(album_id):
 	cur.execute(selector, {'id' : album_id})
 	rows = cur.fetchall()
 	for row in rows:
-		print row['username']
 		access_list[row['username']] = True
 	result.set_perm_list(access_list)
 
@@ -90,8 +89,6 @@ def get_user(username):
 	row = cur.fetchone()
 	split_pass = row['password'].split("$")
 	result = User(row['username'], row['firstname'], row['lastname'], split_pass[2], row['email'])
-	#initialize the album list
-	#print "salt from db: " + split_pass[1]
 	result.set_salt(split_pass[1])
 	selector = "SELECT albumid, title  FROM Album WHERE username=%(usr)s"
 	cur.execute(selector, {'usr': username})
@@ -226,9 +223,7 @@ def add_photo(file, album, cap):
 	if (photoInfo[1] =='jpg' or photoInfo[1] =='png' or photoInfo[1] =='bmp' or photoInfo[1] =='gif'):
 		selector = "SELECT picid FROM Contain WHERE picid=%(id)s"
 		cur.execute(selector, { 'id' : hashId.hexdigest() })
-		print cur.rowcount
 		if cur.rowcount != 0:
-			print 'We got here'
 			return
 		# Saves file to filesystem
 		file.save('static/images/' + hashId.hexdigest() + '.' + photoInfo[1])
@@ -278,7 +273,6 @@ def update_user(inuser):
 			'newEmail': inuser.get_email(), 
 			'pass': 'sha512$' + inuser.get_salt() + '$' + inuser.get_password(),
 			'username': inuser.get_username()}
-	print temp
 	cur.execute(selector, temp)
 	mysql.connection.commit()
 
