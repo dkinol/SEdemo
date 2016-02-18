@@ -19,10 +19,7 @@ def album_route():
 			return render_template('album.html', album = album)
 		else:
 			abort(403)
-	try: 
-		return render_template('album.html', album = album)
-	except TemplateNotFound:
-		abort(404)
+	return render_template('album.html', album = album)
 
 @album.route('/pic', methods=['GET', 'POST'])
 def pic_route():
@@ -83,10 +80,9 @@ def pic_api():
 			if photo.get_username_owner() == session['username']:
 				return jsonify(response)
 	
-@album.route('/api/v1/album',methods=['GET'])
-def album_api():
-	albumname = request.args.get('id')
-	album = extensions.get_album(albumname)
+@album.route('/api/v1/album/<album_id>', methods=['GET'])
+def album_api(album_id):
+	album = extensions.get_album(album_id)
 	response = {}
 	picLis = []
 	if request.method == 'GET':

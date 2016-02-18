@@ -1,20 +1,42 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="container">
-  <h1>This is a view for a single album, a user cannot edit</h1>
-  {% if album.get_picList() == None %}
-  <h2 class="text-center">No Photos in {{album.get_title()}}!</h2>
-  {% else %}
-  <h2 class="text-center">Photos in {{ album.get_title() }}:</h2>
-  {% for pic in album.get_picList() %}
-    <div class="row">
-      <div class="col-md-3 col-md-offset-3 lead"> {{pic.get_date()}} </div>
-      <a id="pic_{{pic.get_picid()}}_link" class="btn btn-primary col-md-offset-2" href="{{ url_for('album.pic_route') }}?id={{ pic.get_picid() }}">View</a>
-      <img src="/static/images/{{pic.get_picid()}}.{{pic.get_format()}}" width="128" height="128" >
-    </div>
-  {% endfor %}
-  {% endif %}
-  <!--<img src="{{ url_for('static', filename='images/football_s1.jpg') }}">-->
-  <a class="btn btn-primary col-md-offset-2" href="{{ url_for('album.album_edit_route') }}?id={{ album.get_id() }}"> Edit Album </a>
+<div id="content" class="container">
+
 </div>
+
+<script>
+	$(document).ready(function(){
+			console.log("Function called");
+			$("#content").append("<h1>This is a view for a single album, a user cannot edit</h1>");
+			$("#content").append("<h2 id=album_title class=text-center></h2>");
+			$("#content").append("<ul id=album_list></ul>");
+	});
+
+	var Album;
+
+	function thumb_pic_template(picid, picformat, picbaseurl){
+		return "<div class=row>" + 
+			"<a id=pic_" + picid + "_link class=btn-primary href=" + picbaseurl + "?id=" + picid + ">View</a>" +
+			"<img src=/static/images/" + picid + "." + picformat + " width=128 height=128></div>";
+	}
+
+	function displayAlbum(album){
+		$("#album_title").val(album.title);
+		for (i = 0; i < album.pics.length; ++i){
+			$("#album_list").append("<li>Picture: " + thumb_pic_template(album.pics[i].picid, album.pics[i].format, "{{ url_for('album.pic_route') }}") + "</li>");
+		}
+	}
+
+	$.ajax({
+		url: "{{ url_for('album.album_api', album_id=album.get_id()) }}",
+		type: "GET",
+		success: function(result){
+			Album = result;
+			console.log(Album);
+			displayAlbum(Album);
+		}
+	});
+
+</script>
+
 {% endblock %}
