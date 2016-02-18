@@ -29,7 +29,6 @@ def pic_route():
 	pic = request.args.get('id')
 	photo = extensions.get_photo(pic)
 	if request.method == 'POST':
-		print 'BAD'
 		if 'username' in session:
 			if photo.get_username_owner() == session['username']:
 				if request.form['op'] == 'caption':
@@ -43,7 +42,6 @@ def pic_route():
 			return redirect(url_for('index.login_route') + '?url=' + url_for('album.pic_route') + '?id=' + pic)
 		elif photo.has_access(session['username']):
 			edit = (photo.get_username_owner() == session['username'])
-			#print 'Edit: ' + edit
 			return render_template('full_pic.html', photo = photo, edit = edit)
 		else:
 			abort(403)
