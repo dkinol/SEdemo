@@ -53,6 +53,34 @@ def pic_route():
 
 	return render_template('full_pic.html', photo = photo, edit = False)
 
+@album.route('/api/v1/album', methods['GET', 'PUT'])
+def album_api():
+	response = {}
+	album_id = request.args.get('id')
+	album = extensions.get_album(album_id)
+	response['access'] = album.get_permissions()
+	response['albumid'] = album.get_albumID()
+	response['created'] = album.get_created()
+	response['lastupdated'] = album.get_lastUpdated()
+	response['pics'] = album.get_picList()
+	response['title'] = album.get_title()
+	response['username'] = album.get_username()
+	if request.method == 'GET':
+		if album.is_private():
+			if 'username' not in session:
+				return redirect(url_for('index.login_route') + 
+					'?url=' + url_for('album.album_route') + '?id=' + album_id)
+			elif album.has_access(session['username']):
+				return jsonify(response)
+			else: 
+				abort(403)
+		if 'username' in session:
+			if photo.get_username_owner() == session['username']:
+				return jsonify(response)
+
+	return jsonify(response)
+
+
 @album.route('/api/v1/pic', methods=['GET', 'PUT'])
 def pic_api():
 	response = {}
