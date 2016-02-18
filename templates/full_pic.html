@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="container">
-  <img src="/static/images/{{photo.get_picid()}}.{{photo.get_format()}}" style="width:100%;height=100%;" alt=""/>
-<p class="text-center" id="pic_{{photo.get_picid()}}_caption"> {{ photo.get_caption() }} </p>
+<div class="container" id="content">
+</div>
+
+  <!--<img src="/static/images/{{photo.get_picid()}}.{{photo.get_format()}}" style="width:100%;height=100%;" alt=""/>
+
 <div class="btn-group_s text-center" role="group" aria-label="...">
   {% if photo.get_prevID() != None %}
   <a id="prev_pic" type="button" class="btn btn-default" href="{{ url_for('album.pic_route') }}?id={{ photo.get_prevID() }}">Previous</a>
@@ -21,8 +23,61 @@
   <input id="pic_caption_input" type="text" name="caption">
   <button type="submit" class="btn btn-primary col-md-offset-0" id="pic_caption_submit">Change Caption</button> 
 </form>
-{% endif %}
+{% endif %}-->
+
+
 <script>
+
+  $(document).ready(function(){
+    console.log("Function called");
+    $("#content").append('<img id=full_pic />'); 
+    $("#content").append('<p id=pic_{{photo.get_picid()}}_caption />');
+    $("#content").append('<a id=prev_pic />');
+    $("#content").append('<a id=parent_album />'); 
+    $("#content").append('<a id=next_pic />');
+  }); 
+
+  function displayPicture(photo){
+    $("#content").append(full_pic_template("/static/images/"+photo.picid+"."+photo.format));
+    $("#content").append(comment_template("pic_"+photo.picid+"_caption", photo.caption));
+    if (photo.prev != ""){
+      $("#content").append(prev_pic_template("{{url_for('album.pic_route')}}"+"?id="+photo.prev+"/"));
+    }
+    $("#content").append(parent_album_template("{{url_for('album.album_route')}}"+"?id="+photo.albumid));
+    if (photo.next != "") {
+      $("#content").append(next_pic_template("{{url_for('album.pic_route')}}"+"?id="+photo.next+"/")); 
+    }
+  }
+
+  function full_pic_template(src){
+    return '<img src="'+src+'" style="width:100%;height=100%;" alt="" />'; 
+  }
+  function comment_template(pic_id, pic_comment){
+    return '<p class="text-center" id="'+pic_id+'" >'+pic_comment+'</p>'; 
+  }
+  function prev_pic_template(pic_url){
+    return '<a id="prev_pic" type="button" class="btn btn-default" href="'+pic_url+'">Previous</a>'; 
+  }
+  function parent_album_template(album_url){
+    return '<a id="parent_album" type="button" class="btn btn-default" href="'+album_url+'">Return to Album</a>';
+  }
+  function next_pic_template(pic_url){
+    return '<a id="next_pic" type="button" class="btn btn-default" href="'+pic_url+'">Next</a>'; 
+  }
+  $.ajax({
+    url: "{{ url_for('album.pic_api', pic=photo.get_picid()) }}", 
+    type: "GET", 
+    success: function(result) {
+      console.log("Returned from api request");
+      Photo = result; 
+      console.log(Photo); 
+      displayPicture(Photo); 
+    }
+  }); 
+
+
+
+
   $("#new_cap").submit(function(event){
     // Prevents the form from submitting normally
     event.preventDefault();
@@ -35,7 +90,7 @@
       prev: "{{photo.get_prevID() }}"
     };
     $.ajax({
-      url: "{{ url_for('album.pic_api') }}",
+      url: "{{ url_for('album.pic_api', pic=photo.get_picid()) }}",
       type: 'PUT',
       contentType: "application/json",
       data: JSON.stringify(pic_cap),
@@ -49,6 +104,7 @@
       }
     });
   });
+  
 </script>  
 </div>
 {% endblock %}
