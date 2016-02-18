@@ -7,8 +7,8 @@ function validateEmail(email, errors){
 	if (re.test(email) == false){
 		errors.push("Email address must be valid");
 	}
-	if (email.length > 20){
-		errors.push("Email must be no longer than 20 characters");
+	if (email.length > 40){
+		errors.push("Email must be no longer than 40 characters");
 	}
 }
 
