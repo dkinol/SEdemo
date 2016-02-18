@@ -6,12 +6,23 @@ import re
 
 user = Blueprint('user', __name__, template_folder='templates')
 
+''' This takes a list of error messages'''
+def generate_error_response(errors):
+    messages = []
+    for error in errors:
+        messages.append({'message': error})
+    final_dict = {'errors': messages}
+    return final_dict
+
 @user.route('/api/v1/user', methods=['GET', 'POST'])
 def user_api():
 	username = ''
 	if request.method == 'POST':
 		errors = []
 		req = request.get_json(force=True)
+                if not ('username' in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
+                        errors.append('You did not provide the necessary fields')
+                        return jsonify(generate_error_response(errors))
 		if req['password1'] != req['password2']:
 			errors.append('Passwords do not match')
 		user = User(req['username'],
@@ -23,12 +34,8 @@ def user_api():
 		temp_user = extensions.get_user(req['username'])
 		if temp_user != None:
 			errors.append('This username is taken')
-		print errors
 		if errors != []:
-			print 'Should return json errors'
-			error_dict = {}
-			error_dict['errors'] = errors
-			return jsonify(error_dict)
+			return jsonify(generate_error_response(errors))
 		user.create_salt()
 		user.hash_pass()
 		extensions.add_user(user)
@@ -67,9 +74,7 @@ def user_edit_api():
 	this_user.set_email(req['email'])
 	errors = errors + this_user.validate()
 	if errors != []:
-		error_dict = {}
-		error_dict['errors'] = errors
-		return jsonify(error_dict)
+		return jsonify(generate_error_response(error_dict))
 	this_user.create_salt()
 	this_user.hash_pass()
 	extensions.update_user(this_user)
