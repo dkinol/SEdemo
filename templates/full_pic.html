@@ -38,14 +38,15 @@
   }); 
 
   function displayPicture(photo){
+		$("#content").empty();
     $("#content").append(full_pic_template("/static/images/"+photo.picid+"."+photo.format));
     $("#content").append(comment_template("pic_"+photo.picid+"_caption", photo.caption));
     if (photo.prev != ""){
-      $("#content").append(prev_pic_template("{{url_for('album.pic_route')}}"+"?id="+photo.prev+"/"));
+      $("#content").append(prev_pic_template("{{url_for('album.pic_route')}}"+"?id="+photo.prev, photo.prev));
     }
     $("#content").append(parent_album_template("{{url_for('album.album_route')}}"+"?id="+photo.albumid));
     if (photo.next != "") {
-      $("#content").append(next_pic_template("{{url_for('album.pic_route')}}"+"?id="+photo.next+"/")); 
+      $("#content").append(next_pic_template("{{url_for('album.pic_route')}}"+"?id="+photo.next, photo.next)); 
     }
   }
 
@@ -55,28 +56,42 @@
   function comment_template(pic_id, pic_comment){
     return '<p class="text-center" id="'+pic_id+'" >'+pic_comment+'</p>'; 
   }
-  function prev_pic_template(pic_url){
-    return '<a id="prev_pic" type="button" class="btn btn-default" href="'+pic_url+'">Previous</a>'; 
+  function prev_pic_template(pic_url, picid){
+    return '<a id="prev_pic" type="button" class="btn btn-default" href="'+pic_url+'" target="' + picid + '">Previous</a>'; 
   }
   function parent_album_template(album_url){
     return '<a id="parent_album" type="button" class="btn btn-default" href="'+album_url+'">Return to Album</a>';
   }
-  function next_pic_template(pic_url){
-    return '<a id="next_pic" type="button" class="btn btn-default" href="'+pic_url+'">Next</a>'; 
+  function next_pic_template(pic_url, picid){
+		return '<a id="next_pic" type="button" class="btn btn-default" href="'+pic_url+'" target="' + picid + '"Next></a>'; 
   }
-  $.ajax({
-    url: "{{ url_for('album.pic_api', pic=photo.get_picid()) }}", 
-    type: "GET", 
-    success: function(result) {
-      console.log("Returned from api request");
-      Photo = result; 
-      console.log(Photo); 
-      displayPicture(Photo); 
-    }
-  }); 
 
+	function get_and_display_pic(inpicid){
+  	$.ajax({
+    	url: "{{ url_for('album.pic_api', pic='') }}" + inpicid, 
+    	type: "GET", 
+    	success: function(result) {
+      	console.log("Returned from api request");
+      	Photo = result; 
+      	console.log(Photo); 
+      	displayPicture(Photo); 
+    	}
+  	}); 
+	}
 
+	get_and_display_pic("{{ photo.get_picid() }}");
 
+	$('body').on('click', "#prev_pic", function(event){
+		event.preventDefault();
+		var picid = event.target.target;
+		get_and_display_pic(picid);
+	});
+
+	$('body').on('click', "#next_pic", function(event){
+		event.preventDefault();
+		var picid = event.target.target;
+		get_and_display_pic(picid);
+	});
 
   $("#new_cap").submit(function(event){
     // Prevents the form from submitting normally
