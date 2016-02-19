@@ -1,6 +1,14 @@
+save_state = true;
+function AppState(intype, inid){
+	this.type = intype;
+	this.id = inid;
+}
+
+var AlbumId = -1;
 // Sets the basic page contents for an album
-function set_album_context(){
+function set_album_context(albumid){
 		$("#content").empty();
+		AlbumId = albumid;
 		$("#content").append("<h1>This is a view for a single album, a user cannot edit</h1>");
 		$("#content").append("<h2 id=album_title class=text-center></h2>");
 		$("#content").append("<ul id=album_list></ul>");
@@ -34,13 +42,18 @@ function displayAlbum(album){
 
 // Fetches and displays album from server
 function get_and_display_album(albumid){
+	AlbumId = albumid;
 	$.ajax({
 		url: album_api_route(albumid),
 		type: "GET",
 		success: function(result){
 			var Album = result;
-			console.log(Album);
+			if (save_state){
+				var app_state = new AppState('album', albumid);
+				history.pushState(app_state, "", album_template_route(AlbumId));
+			}
 			displayAlbum(Album);
+			save_state = true;
 		}
 	});
 }
@@ -93,10 +106,26 @@ function get_and_display_pic(inpicid){
 		type: "GET", 
 		success: function(result) {
 			PicModel = result; 
-			console.log(PicModel); 
+			if (save_state === true){
+				var app_state = new AppState("pic", PicModel.picid);
+				history.pushState(app_state, "", pic_template_route(PicModel.picid));
+			}
 			displayPicture(PicModel); 
+			save_state = true;
 		}
 	}); 
+}
+
+window.onpopstate = function(event){
+	save_state = false;
+	if (event.state.type == 'album'){
+		set_album_context(event.state.id);
+		get_and_display_album(event.state.id);
+	}
+	else{
+		set_pic_context(event.state.id);
+		get_and_display_pic(event.state.id);
+	}
 }
 
 // Album page, when clicked it loads a picture
@@ -104,32 +133,33 @@ $('body').on('click', "a[id^='pic_']", function(event){
 		// Prevents the user from following the link
 		event.preventDefault();
 		var picId = event.target.target;
-		
-		$.ajax({
-			url: pic_api_route(picId),
-			type: "GET",
-			success: function(result){
-				set_pic_context(picId);
-				get_and_display_pic(picId);
-			}
-		});
+		//var app_state = new AppState("album", AlbumId);
+		//history.pushState(app_state, "", album_template_route(AlbumId));
+		set_pic_context(picId);
+		get_and_display_pic(picId);
 });
 
 // Controller functions for next and previous pic
 $('body').on('click', "#prev_pic", function(event){
 	event.preventDefault();
 	var picid = event.target.target;
+	//var app_state = new AppState("pic", PicModel.picid);
+	//history.pushState(app_state, "", pic_template_route(PicModel.picid));
 	get_and_display_pic(picid);
 });
 
 $('body').on('click', "#next_pic", function(event){
 	event.preventDefault();
 	var picid = event.target.target;
+	//var app_state = new AppState("pic", PicModel.picid);
+	//history.pushState(app_state, "", pic_template_route(PicModel.picid));
 	get_and_display_pic(picid);
 });
 
 $('body').on('click', "#parent_album", function(event){
 	event.preventDefault();
+	//var app_state = new AppState("pic", PicModel.picid);
+	//history.pushState(app_state, "", pic_template_route(PicModel.picid));
 	set_album_context();
 	get_and_display_album(PicModel.albumid);
 });
