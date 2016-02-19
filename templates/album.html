@@ -5,55 +5,8 @@
 </div>
 
 <script>
-	$(document).ready(function(){
-			console.log("Function called");
-			$("#content").append("<h1>This is a view for a single album, a user cannot edit</h1>");
-			$("#content").append("<h2 id=album_title class=text-center></h2>");
-			$("#content").append("<ul id=album_list></ul>");
-	});
-
-	var Album;
-	//href=" + picbaseurl + "?id=" + picid + "
-
-	function thumb_pic_template(picid, picformat, picbaseurl){
-		return '<div class=row>' + 
-			'<a id=pic_' + picid + '_link class="btn btn-primary" target=' + picid + '>View</a>' +
-			'<img src="/static/images/' + picid + "." + picformat + '" width=128 height=128></div>';
-	}
-
-	function displayAlbum(album){
-		$("#album_title").val(album.title);
-		for (i = 0; i < album.pics.length; ++i){
-			var new_ele = thumb_pic_template(album.pics[i].picid, album.pics[i].format, "{{ url_for('album.pic_route') }}");
-			$("#album_list").append("<li>Picture: " + new_ele + "</li>");
-		}
-	}
-
-	$.ajax({
-		url: "{{ url_for('album.album_api', album_id=album.get_id()) }}",
-		type: "GET",
-		success: function(result){
-			Album = result;
-			console.log(Album);
-			displayAlbum(Album);
-		}
-	});
-
-	$('body').on('click', "a[id^='pic_']", function(event){
-			// Prevents the user from following the link
-			event.preventDefault();
-			console.log("Clicked the link id: " + event.target.target);
-			var picId = event.target.target;
-			
-			$.ajax({
-				url: "{{ url_for('album.pic_api', pic='') }}" + picId,
-				type: "GET",
-				success: function(result){
-					console.log(result);
-					$("#content").empty();
-				}
-			});
-	});
+set_album_context();
+get_and_display_album({{ album.get_id() }});
 </script>
 
 {% endblock %}
