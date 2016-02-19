@@ -7,6 +7,7 @@
     {% endfor %}
 
     <form class="col-md-offset-3 col-md-3" id="update_user">
+			<input id="update_username_input" type="hidden" name="username" value="{{ user.get_username() }}">
       <div class="form-group">
         <input id="update_firstname_input" type="text" name="firstname" class="form-control" placeholder="New First Name">
       </div>
@@ -37,12 +38,14 @@
 		event.preventDefault();
 
 		$("#error_list").empty();
-		function printErrors(error_list){
-			for (i = 0; i < error_list.length; ++i){
-				$("#error_list").append("<li><p class=error>" + errors_list[i] + "</p></li>");
+		function printErrors(inerrors){
+			console.log(inerrors);
+			for (i = 0; i < inerrors.length; ++i){
+				$("#error_list").append("<li><p class=error>" + inerrors[i] + "</p></li>");
 			}
 		}
 		var update_req = {
+			username: $("#update_username_input").val(),
 			firstname: $("#update_firstname_input").val(),
 			lastname: $("#update_lastname_input").val(),
 			email: $("#update_email_input").val(),
@@ -65,23 +68,21 @@
 				contentType: "application/json",
 				data: JSON.stringify(update_req),
 				success: function(result){
+					$("#update_firstname_input").val("");
+					$("#update_lastname_input").val("");
+					$("#update_email_input").val("");
+					$("#update_password1_input").val("");
+					$("#update_password2_input").val("");
+				},
+				error: function(error_resp){
+					var result = JSON.parse(error_resp.responseText);
 					var server_err = [];
 					if ('errors' in result){
 						for (i = 0; i < result.errors.length; ++i){
-							server_err.push(result.errors[i]);
+							server_err.push(result.errors[i].message);
 						}
 						printErrors(server_err);
 					}
-					else{
-						$("#update_firstname_input").val("");
-						$("#update_lastname_input").val("");
-						$("#update_email_input").val("");
-						$("#update_password1_input").val("");
-						$("#update_password2_input").val("");
-					}
-				},
-				error: function(e){
-					console.log(e.message);
 				}
 			});
 		}

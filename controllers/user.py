@@ -72,7 +72,7 @@ def user_edit_api():
 	this_user.set_email(req['email'])
 	errors = errors + this_user.validate()
 	if errors != []:
-		return jsonify(generate_error_response(error_dict)), 422
+		return jsonify(generate_error_response(errors)), 422
 	this_user.create_salt()
 	this_user.hash_pass()
 	extensions.update_user(this_user)

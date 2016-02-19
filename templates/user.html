@@ -65,24 +65,24 @@
 				contentType: "application/json",
 				data: JSON.stringify(user_req),
 				success: function(result){
+					console.log("Success function");
+					$("#new_username_input").val("");
+					$("#new_firstname_input").val("");
+					$("#new_lastname_input").val("");
+					$("#new_email_input").val("");
+					$("#new_password1_input").val("");
+					$("#new_password2_input").val("");
+				},
+				error: function(error_resp){
+					var result = JSON.parse(error_resp.responseText);
 					var server_err = [];
 					if ('errors' in result){
 						for (i = 0; i < result.errors.length; ++i){
-							server_err.push(result.errors[i]);
+							server_err.push(result.errors[i].message);
 						}
+						console.log(server_err);
 						printErrors(server_err);
 					}
-					else{
-						$("#new_username_input").val("");
-						$("#new_firstname_input").val("");
-						$("#new_lastname_input").val("");
-						$("#new_email_input").val("");
-						$("#new_password1_input").val("");
-						$("#new_password2_input").val("");
-					}
-				},
-				error: function(e){
-					console.log(e.message);
 				}
 			});
 		}

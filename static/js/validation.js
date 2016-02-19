@@ -30,13 +30,13 @@ function validatePassword(password1, password2, errors){
 }
 
 function validateFirstname(firstname, errors){
-	if (firstname < 20){
+	if (firstname.length > 20){
 		errors.push("Firstname must be no longer than 20 characters");
 	}
 }
 
 function validateLastname(lastname, errors){
-	if (lastname< 20){
+	if (lastname.length > 20){
 		errors.push("Lastname must be no longer than 20 characters");
 	}
 }
@@ -46,10 +46,10 @@ function validateUsername(username, errors){
 	if (re.test(username) == false){
 		errors.push("Usernames may only contain letters, digits, and underscores");
 	}
-	if (username < 3){
+	if (username.length < 3){
 		errros.push("Usernames must be at least 3 characters long");
 	}
-	if (username > 20){
+	if (username.length > 20){
 		errors.push("Username must be no longer than 20 characters");
 	}
 }
