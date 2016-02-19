@@ -17,3 +17,8 @@ def send_403():
 	errors = []
 	errors.append("You do not have the necessary permissions for the resource")
 	return jsonify(generate_error_response(errors)), 403
+
+def send_404():
+	errors = []
+	errors.append("The requested resource could not be found")
+	return jsonify(generate_error_response(errors)), 404

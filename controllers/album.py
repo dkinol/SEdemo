@@ -1,7 +1,7 @@
 from flask import * 
 import extensions
 from werkzeug import secure_filename
-from controllers.support import generate_error_response, send_401, send_403
+from controllers.support import generate_error_response, send_401, send_403, send_404
 from objects.Photo import Photo
 from objects.Album import Album
 import os
@@ -52,16 +52,31 @@ def pic_route():
 
 @album.route('/api/v1/pic/<pic>', methods=['GET', 'PUT'])
 def pic_api(pic):
+        errors = []
+        print "got to route"
 	if request.method == 'PUT':
-		if 'username' in session:
-			req = request.get_json(force=True)
-			pic = req['picid']
-			photo = extensions.get_photo(pic)
-			if photo.get_username_owner() == session['username']:
-					extensions.update_photo_caption(pic, req['caption'])
+		req = request.get_json(force=True)
+                if ('albumid' not in req) or ('caption' not in req) or ('format' not in req) or ('next' not in req) or ('picid' not in req) or ('prev' not in req):
+                    errors.append("You did not provide the necessary fields")
+                    return jsonify(generate_error_response(errors)), 422
+		photo = extensions.get_photo(pic)
+                if photo == None:
+                    return send_404()
+                if 'username' not in session:
+                    return send_401()
+                if session['username'] != photo.get_username_owner():
+                    return send_403()
+                if req['albumid'] != photo.get_albumID() or req['format'] != photo.get_format() or req['next'] != photo.get_nextID() or req['picid'] != photo.get_picid() or req['prev'] != photo.get_prevID():
+                    errors.append("You can only update caption")
+                    return jsonify(generate_error_response(errors)), 403
+		pic = req['picid']
+		if photo.get_username_owner() == session['username']:
+		    extensions.update_photo_caption(pic, req['caption'])
 	if pic != '':
 		response = {}
 		photo = extensions.get_photo(pic)
+                if photo == None:
+                    return send_404()
 		response['albumid'] = photo.get_albumID()
 		response['caption'] = photo.get_caption()
 		response['format'] = photo.get_format()
@@ -70,17 +85,18 @@ def pic_api(pic):
 		response['prev'] = photo.get_prevID()
 		if photo.is_private():
 			if 'username' not in session: 
-				return redirect(url_for('index.login_route') + 
-					'?url=' + url_for('album.pic_route') + '?id=' + pic)
+                                return send_401()
 			elif photo.has_access(session['username']):
 				return jsonify(response)
 			else:
-				abort(403)
-        	return jsonify(response)
+                                return send_403()
+        	return jsonify(response), 201
 	
 @album.route('/api/v1/album/<album_id>', methods=['GET'])
 def album_api(album_id):
 	album = extensions.get_album(album_id)
+        if album == None:
+            return send_404()
 	response = {}
 	picLis = []
 	if request.method == 'GET':
@@ -94,6 +110,10 @@ def album_api(album_id):
 			thisPic['prev'] = photo.get_prevID()
 			picLis.append(thisPic)
 		if album.is_private() == True:
+                        if 'username' not in session:
+                            return send_401()
+                        if session['username'] != album.get_username():
+                            return send_403()
 			response['access'] = 'private'
 		else :
 			response['access'] = 'public'
@@ -106,7 +126,7 @@ def album_api(album_id):
 	#elif request.method == 'POST':
 	#	req = request.get_json(force=True)
 	#	#not sure what to do with retrived data
-	return jsonify(response)
+	return jsonify(response), 201
 
 @album.route('/album/edit', methods=['GET', 'POST'])
 def album_edit_route():
