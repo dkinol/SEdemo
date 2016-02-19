@@ -2,7 +2,7 @@
 {% block body %}
 <div class="container">
   <h2 class="text-center"> Login </h2>
-  <form class="form-inline col-md-offset-3" action="{{ url_for('index.login_route') }}" method="post">
+  <form id="login_form" class="form-inline col-md-offset-3" >
     <input id="login_username_input" type="text" name="username" class="form-control" placeholder="Username" />
     <input id="login_password_input" type="password" name="password" class="form-control" placeholder="Password" />
     <button id="login_submit" type="submit" class="btn btn-primary col-md-offset-2"> Login </button> 
@@ -13,4 +13,34 @@
   <p class="error" id="error_combo">Incorrect password</p>
   {% endif %}
 </div>
+
+<script>
+    $("#login_form").submit(function(event){
+        event.preventDefault();
+        console.log("got here");
+        var user_req = {
+            username: $("#login_username_input").val(),
+            password: $("#login_password_input").val()
+        }
+
+        $.ajax({
+            url: "{{ url_for('index.login_api')}}",
+            type: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify(user_req),
+            success: function(result){
+                console.log("success function");
+                $("#login_username_input").val(""),
+                $("#login_password_input").val("")
+                $(location).attr('href', "{{request.args.get('url')}}")
+            },
+            error: function(error_resp){
+                console.log("ERROR");
+            }
+        });
+    });
+</script>
+
+
+
 {% endblock %}

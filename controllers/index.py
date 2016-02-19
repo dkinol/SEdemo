@@ -18,7 +18,7 @@ def main_route():
 	return render_template("homepage.html", albums=albums)	
 
 
-@index.route('/api/v1/login', methods=['POST',])
+@index.route('/api/v1/login', methods=['POST'])
 def login_api():
 	req = request.get_json(force=True)
 	errors = []
@@ -36,37 +36,12 @@ def login_api():
 		session['lastname'] = user.get_lastname()
 		result = {}
 		result['username'] = user.get_username()
-		return jsonify(result)
+		return jsonify(result), 201
 	errors.push("Password is incorrect for the specified username")
 	return jsonify(generate_error_response(errors)), 422
 
 @index.route('/login', methods=['GET', 'POST'])
 def login_route():
-	if request.method == 'GET':
-		url = request.args.get('url')
-		if url == None:
-			url = '/'
-		#print "geturl: " + url
-		return render_template("login.html", error='')
-
-	if request.method == 'POST':
-		url = request.args.get('url')
-		if url == None:
-			url = url_for('index.main_route')
-		print request.form['username']
-		print request.form['password']
-		inuser = extensions.get_user(request.form['username'])
-		if inuser == None:
-			return render_template("login.html", error='Invalid username')
-		user_pass = request.form['password']
-		#print "posturl: " + url
-		if inuser.check_pass(user_pass):
-			session['username'] = inuser.get_username()
-			session['firstname'] = inuser.get_firstname()
-			session['lastname'] = inuser.get_lastname()
-			return redirect(url)
-		else:
-			return render_template('login.html', error='Invalid password')
 	return render_template("login.html")
 
 @index.route('/api/v1/logout', methods=['POST'])
