@@ -57,7 +57,7 @@ def get_album(album_id):
 	selector = "SELECT * FROM Album WHERE albumid=%(album)s"
 	cur.execute(selector, {'album': album_id})
 	if cur.rowcount == 0:
-		abort(404)
+            return None
 	row = cur.fetchone()
 	private = True
 	if row['access'] == 'public':
@@ -113,7 +113,7 @@ def get_photo(photoId):
 	selector = "SELECT * FROM Photo WHERE picid =%(pcid)s"
 	cur.execute(selector, {'pcid':photoId})
 	if cur.rowcount == 0:
-		abort(404)
+            return None
 	row = cur.fetchone()
 	pid = row['picid']
 	form = row['format']
