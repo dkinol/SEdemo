@@ -28,10 +28,29 @@
         <a id="nav_home" class="btn btn-primary" href="{{ url_for('index.main_route') }}">Nav Home</a>
         <a id="nav_edit" class="btn btn-primary" href="{{ url_for('user.user_edit_route') }}">Edit Account</a>
         <a id="nav_albums" class="btn btn-primary" href="{{ url_for('albums.albums_route') }}">My Albums</a>
-        <form class="form-inline" action="{{ url_for('index.logout_route') }}" method="post">
+        <form class="form-inline" id="logout_form">
           <button id="nav_logout" type="submit" class="btn btn-primary">Logout</button> 
         </form>
       </div>
+      <script>
+      $("#logout_form").submit(function(event){
+        event.preventDefault();
+        console.log("logout script");
+
+        $.ajax({
+            url: "{{ url_for('index.logout_api')}}",
+            type: 'POST',
+            success: function(result){
+                console.log("success function");
+                $(location).attr('href', "{{url_for('index.main_route')}}")
+            },
+            error: function(error_resp){
+                console.log("ERROR");
+            }
+        });
+    });
+
+      </script>
       {% endif %}
     </div>
   </header>
