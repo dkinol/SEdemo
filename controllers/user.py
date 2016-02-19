@@ -1,6 +1,6 @@
 from flask import *
 from objects.User import User
-from controllers.support import generate_error_response
+from controllers.support import generate_error_response, send_401, send_403
 import extensions
 import re
 ''' This controller handles the /user urls, mainly dealing with creation and deletion of user accounts '''
@@ -35,9 +35,7 @@ def user_api():
 		username = req['username']
 	if username == '':
 		if 'username' not in session:
-                        errors = []
-                        errors.append("You do not have the necessary credentials for the resource")
-                        return jsonify(generate_error_response(errors)), 401
+                        return send_401()
 		username = session['username']
 	user = extensions.get_user(username)
 	response = {}
@@ -55,16 +53,12 @@ def user_route():
 @user.route('/api/v1/user', methods=['PUT'])
 def user_edit_api():
 	if 'username' not in session:
-            errors = []
-            errors.append("You do not have the necessary credentials for the resource")
-            return jsonify(generate_error_response(errors)), 401
+            return send_401()
 	req = request.get_json(force=True)
 	username = session['username']
 	this_user = extensions.get_user(username)
         if (req['username'] != this_user.get_username()):
-            errors = []
-            errors.append("You do not have the necessary permissions for the resource")
-            return jsonify(generate_error_response(errors)), 403
+            return send_403()
 	if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
             errors.append('You did not provide the necessary fields')
             return jsonify(generate_error_response(errors)), 422

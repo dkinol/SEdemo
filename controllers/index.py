@@ -1,4 +1,5 @@
 from flask import *
+from controllers.support import generate_error_response, send_401, send_403
 import extensions
 import os
 
@@ -21,9 +22,13 @@ def main_route():
 def login_api():
 	req = request.get_json(force=True)
 	errors = []
+	if ('username' not in req) or ('password' not in req):
+		errors.push("You did not provide the necessary fields")
+		return jsonify(generate_error_response(errors)), 422
 	user = extensions.get_user(req['username'])
 	if user == None:
-		errors.append('Invalid username')
+		errors.push("Username does not exist")
+		return jsonify(generate_error_response(errors)), 404
 	user_pass = req['password']
 	if user.check_pass(user_pass):
 		session['username'] = user.get_username()
@@ -32,8 +37,8 @@ def login_api():
 		result = {}
 		result['username'] = user.get_username()
 		return jsonify(result)
-	errors.append('Invalid password')
-	return jsonify(errors)
+	errors.push("Password is incorrect for the specified username")
+	return jsonify(generate_error_response(errors)), 422
 
 @index.route('/login', methods=['GET', 'POST'])
 def login_route():
@@ -66,6 +71,8 @@ def login_route():
 
 @index.route('/api/v1/logout', methods=['POST'])
 def logout_api():
+	if 'username' not in session:
+		send_401()
 	session.pop('username', None)
 	session.pop('firstname', None)
 	session.pop('lastname', None)
