@@ -20,9 +20,9 @@ def user_api():
 	if request.method == 'POST':
 		errors = []
 		req = request.get_json(force=True)
-                if not ('username' in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
+                if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
                         errors.append('You did not provide the necessary fields')
-                        return jsonify(generate_error_response(errors))
+                        return jsonify(generate_error_response(errors)), 422
 		if req['password1'] != req['password2']:
 			errors.append('Passwords do not match')
 		user = User(req['username'],
@@ -35,7 +35,7 @@ def user_api():
 		if temp_user != None:
 			errors.append('This username is taken')
 		if errors != []:
-			return jsonify(generate_error_response(errors))
+			return jsonify(generate_error_response(errors)), 422
 		user.create_salt()
 		user.hash_pass()
 		extensions.add_user(user)
@@ -50,7 +50,7 @@ def user_api():
 	response['firstname'] = user.get_firstname()
 	response['lastname'] = user.get_lastname()
 	response['email'] = user.get_email()
-	return jsonify(response)
+	return jsonify(response), 201
 	
 
 @user.route('/user', methods=['GET'])
@@ -62,6 +62,9 @@ def user_edit_api():
 	if 'username' not in session:
 		abort(401)
 	req = request.get_json(force=True)
+	if ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
+                        errors.append('You did not provide the necessary fields')
+                        return jsonify(generate_error_response(errors)), 422
 	username = session['username']
 	this_user = extensions.get_user(username)
 	errors = []
@@ -74,11 +77,11 @@ def user_edit_api():
 	this_user.set_email(req['email'])
 	errors = errors + this_user.validate()
 	if errors != []:
-		return jsonify(generate_error_response(error_dict))
+		return jsonify(generate_error_response(error_dict)), 422
 	this_user.create_salt()
 	this_user.hash_pass()
 	extensions.update_user(this_user)
-	return user_api()
+	return user_api(), 201
 
 @user.route('/user/edit', methods=['GET'])
 def user_edit_route():
