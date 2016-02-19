@@ -1,18 +1,11 @@
 from flask import *
 from objects.User import User
+from controllers.support import generate_error_response
 import extensions
 import re
 ''' This controller handles the /user urls, mainly dealing with creation and deletion of user accounts '''
 
 user = Blueprint('user', __name__, template_folder='templates')
-
-''' This takes a list of error messages'''
-def generate_error_response(errors):
-    messages = []
-    for error in errors:
-        messages.append({'message': error})
-    final_dict = {'errors': messages}
-    return final_dict
 
 @user.route('/api/v1/user', methods=['GET', 'POST'])
 def user_api():
@@ -42,7 +35,9 @@ def user_api():
 		username = req['username']
 	if username == '':
 		if 'username' not in session:
-			abort(401)
+                        errors = []
+                        errors.append("You do not have the necessary credentials for the resource")
+                        return jsonify(generate_error_response(errors)), 401
 		username = session['username']
 	user = extensions.get_user(username)
 	response = {}
@@ -60,13 +55,19 @@ def user_route():
 @user.route('/api/v1/user', methods=['PUT'])
 def user_edit_api():
 	if 'username' not in session:
-		abort(401)
+            errors = []
+            errors.append("You do not have the necessary credentials for the resource")
+            return jsonify(generate_error_response(errors)), 401
 	req = request.get_json(force=True)
-	if ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
-                        errors.append('You did not provide the necessary fields')
-                        return jsonify(generate_error_response(errors)), 422
 	username = session['username']
 	this_user = extensions.get_user(username)
+        if (req['username'] != this_user.get_username()):
+            errors = []
+            errors.append("You do not have the necessary permissions for the resource")
+            return jsonify(generate_error_response(errors)), 403
+	if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
+            errors.append('You did not provide the necessary fields')
+            return jsonify(generate_error_response(errors)), 422
 	errors = []
 	if req['password1'] != req['password2']:
 		errors.append('Passwords do not match')
