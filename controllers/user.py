@@ -10,9 +10,9 @@ user = Blueprint('user', __name__, template_folder='templates')
 @user.route('/api/v1/user', methods=['GET', 'POST'])
 def user_api():
 	username = ''
+	req = request.get_json(force=True)
 	if request.method == 'POST':
 		errors = []
-		req = request.get_json(force=True)
 		if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
 		    errors.append('You did not provide the necessary fields')
 		    return jsonify(generate_error_response(errors)), 422
@@ -35,6 +35,8 @@ def user_api():
 		if username == '':
 			if 'username' not in session:
 				return send_401()
+	print 'GOT HERE'
+	username = req['username']
 	user = extensions.get_user(username)
 	response = {}
 	response['username'] = user.get_username()
@@ -60,24 +62,27 @@ def user_edit_api():
 	if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
             errors.append('You did not provide the necessary fields')
             return jsonify(generate_error_response(errors)), 422
-	if (req['username'] == '') or (req['email'] == '') or (req['password1'] == '') or (req['password2'] == ''):
+	if (req['username'] == '') or (req['email'] == ''):
 	        errors.append('You did not provide the necessary fields')
 	        return jsonify(generate_error_response(errors)), 422
 	errors = []
 	if req['password1'] != req['password2']:
 		errors.append('Passwords do not match')
-	if req['password1'] != '':
-		this_user.set_password(req['password1'])
 	this_user.set_firstname(req['firstname'])
 	this_user.set_lastname(req['lastname'])
 	this_user.set_email(req['email'])
+	if req['password1'] != '' and req['password2'] != '':
+		print 'CHANGED PASSWORD'
+		this_user.set_password(req['password1'])
 	errors = errors + this_user.validate()
 	if errors != []:
 		return jsonify(generate_error_response(errors)), 422
-	this_user.create_salt()
-	this_user.hash_pass()
+	elif req['password1'] != '':
+		this_user.create_salt()
+		this_user.hash_pass()
 	extensions.update_user(this_user)
-	return user_api(), 200
+	print 'will return now'
+	return user_api()
 
 @user.route('/user/edit', methods=['GET'])
 def user_edit_route():

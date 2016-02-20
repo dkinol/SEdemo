@@ -78,7 +78,7 @@ class User:
 		self.__password = m.hexdigest()
 
 	def validate(self):
-		self.print_user_info()
+		#self.print_user_info()
 		message = []
 		if len(self.__username) < 3:
 			message.append('Usernames must be at least 3 characters long')
