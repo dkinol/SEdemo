@@ -13,13 +13,6 @@ album = Blueprint('album', __name__, template_folder='templates')
 def album_route():
 	albumname = request.args.get('id')
 	album = extensions.get_album(albumname)
-	if album.is_private():
-		if 'username' not in session:
-			return redirect(url_for('index.login_route') + '?url=' + url_for('album.album_route') + '?id=' + albumname)
-		elif album.has_access(session['username']):
-			return render_template('album.html', album = album)
-		else:
-			abort(403)
 	return render_template('album.html', album = album)
 
 @album.route('/pic', methods=['GET', 'POST'])
