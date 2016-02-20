@@ -13,34 +13,28 @@ def user_api():
 	if request.method == 'POST':
 		errors = []
 		req = request.get_json(force=True)
-        if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
-            errors.append('You did not provide the necessary fields')
-            return jsonify(generate_error_response(errors)), 422
-        if (req['username'] == '') or (req['email'] == '') or (req['password1'] == '') or (req['password2'] == ''):
-            errors.append('You did not provide the necessary fields')
-            return jsonify(generate_error_response(errors)), 422
-        if req['password1'] != req['password2']:
-        	errors.append('Passwords do not match')
+		if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
+		    errors.append('You did not provide the necessary fields')
+		    return jsonify(generate_error_response(errors)), 422
+		if (req['username'] == '') or (req['email'] == '') or (req['password1'] == '') or (req['password2'] == ''):
+		    errors.append('You did not provide the necessary fields')
+		    return jsonify(generate_error_response(errors)), 422
+		if req['password1'] != req['password2']:
+			errors.append('Passwords do not match')
 		user = User(req['username'], req['firstname'], req['lastname'], req['password1'], req['email'])
-		print user.validate()
 		errors = errors + user.validate()
 		temp_user = extensions.get_user(req['username'])
 		if temp_user != None:
 			errors.append('This username is taken')
-		print errors
 		if errors != []:
-			print 'should return errors'
 			return jsonify(generate_error_response(errors)), 422
 		user.create_salt()
 		user.hash_pass()
 		extensions.add_user(user)
 		username = req['username']
-	if username == '':
-		if 'username' not in session:
-			print "send_401"
-			return send_401()
-			print "failed"
-		username = session['username']
+		if username == '':
+			if 'username' not in session:
+				return send_401()
 	user = extensions.get_user(username)
 	response = {}
 	response['username'] = user.get_username()
