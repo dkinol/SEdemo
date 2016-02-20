@@ -61,7 +61,7 @@ function validateUsername(username, errors){
 		errors.push("Usernames may only contain letters, digits, and underscores");
 	}
 	if (username.length < 3){
-		errros.push("Usernames must be at least 3 characters long");
+		errors.push("Usernames must be at least 3 characters long");
 	}
 	if (username.length > 20){
 		errors.push("Username must be no longer than 20 characters");

@@ -37,6 +37,8 @@
             },
             error: function(error_resp){
                 console.log("ERROR");
+                $("#login_username_input").val(""),
+                $("#login_password_input").val("")
                 displayErrors(error_resp);
             }
         });
