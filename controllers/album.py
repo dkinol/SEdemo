@@ -90,7 +90,7 @@ def pic_api(pic):
 				return jsonify(response)
 			else:
                                 return send_403()
-        	return jsonify(response), 201
+        	return jsonify(response), 200
 	
 @album.route('/api/v1/album/<album_id>', methods=['GET'])
 def album_api(album_id):
@@ -126,7 +126,7 @@ def album_api(album_id):
 	#elif request.method == 'POST':
 	#	req = request.get_json(force=True)
 	#	#not sure what to do with retrived data
-	return jsonify(response), 201
+	return jsonify(response), 200
 
 @album.route('/album/edit', methods=['GET', 'POST'])
 def album_edit_route():
