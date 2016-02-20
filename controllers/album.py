@@ -12,17 +12,12 @@ album = Blueprint('album', __name__, template_folder='templates')
 @album.route('/album', methods=['GET'])
 def album_route():
 	albumname = request.args.get('id')
-	album = extensions.get_album(albumname)
-        if album == None:
-            album = Album(-1, None, None, None, None, None)
-	return render_template('album.html', album = album)
+	return render_template('album.html', albumid = albumname)
 
 @album.route('/pic', methods=['GET', 'POST'])
 def pic_route():
 	pic = request.args.get('id')
 	photo = extensions.get_photo(pic)
-        if photo == None:
-            return render_template('full_pic.html', photo = Photo(-1, None, None, None, None, None, None, None, None, None))          
 	if request.method == 'POST':
 		if 'username' in session:
 			if photo.get_username_owner() == session['username']:
@@ -32,7 +27,7 @@ def pic_route():
 					return render_template('full_pic.html', photo = photo, edit = True)
 		abort(403)
 					
-	return render_template('full_pic.html', photo = photo, edit = False)
+	return render_template('full_pic.html', picid = pic)
 
 @album.route('/api/v1/pic/<pic>', methods=['GET', 'PUT'])
 def pic_api(pic):

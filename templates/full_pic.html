@@ -4,12 +4,8 @@
 </div>
 
 <script>
-set_pic_context("{{ photo.get_picid() }}");
-get_and_display_pic("{{ photo.get_picid() }}");
-
-{% if 'username' in session %}
-SessionUser = "{{ session['username'] }}";
-{% endif %}
+set_pic_context("{{ picid }}");
+get_and_display_pic("{{ picid }}");
 
 </script>
 </div>

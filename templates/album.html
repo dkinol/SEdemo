@@ -5,11 +5,8 @@
 </div>
 
 <script>
-set_album_context({{ album.get_id() }});
-get_and_display_album({{ album.get_id() }});
-{% if 'username' in session %}
-SessionUser = "{{ session['username'] }}";
-{% endif %}
+set_album_context({{ albumid }});
+get_and_display_album({{ albumid }});
 </script>
 
 {% endblock %}

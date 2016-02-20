@@ -4,7 +4,6 @@ function AppState(intype, inid){
 	this.id = inid;
 }
 
-var SessionUser = "";
 var AlbumId = -1;
 var CanEdit = false;
 
@@ -113,6 +112,15 @@ function displayPicture(photo){
 	}
 }
 
+function display_pic_helper(){
+	if (save_state === true){
+		var app_state = new AppState("pic", PicModel.picid);
+		history.pushState(app_state, "", pic_template_route(PicModel.picid));
+	}
+	displayPicture(PicModel); 
+	save_state = true;
+}
+
 // Function gets picture from server then displays it
 function get_and_display_pic(inpicid){
 	if (inpicid == 'null'){
@@ -128,20 +136,23 @@ function get_and_display_pic(inpicid){
 				type: "GET",
 				success: function (result){
 					var album = result;
-					if (album.username == SessionUser){
-						CanEdit = true;
-					}
-					else{
-						CanEdit = false;
-					}
-					if (save_state === true){
-						console.log("Save pic state");
-						var app_state = new AppState("pic", PicModel.picid);
-						console.log(app_state);
-						history.pushState(app_state, "", pic_template_route(PicModel.picid));
-					}
-					displayPicture(PicModel); 
-					save_state = true;
+					$.ajax({
+						url: get_user_api_route(),
+						type: "GET",
+						success: function (result){
+							if (album.username == result.username){
+								CanEdit = true;
+							}
+							else{
+								CanEdit = false;
+							}
+							display_pic_helper();
+						},
+						error: function(){
+							CanEdit = false;
+							display_pic_helper();
+						}
+					});
 				}
 			});
 		},
