@@ -62,11 +62,7 @@
 				contentType: "application/json",
 				data: JSON.stringify(update_req),
 				success: function(result){
-					$("#update_firstname_input").val("");
-					$("#update_lastname_input").val("");
-					$("#update_email_input").val("");
-					$("#update_password1_input").val("");
-					$("#update_password2_input").val("");
+					// Do nothing, this is intentional, see piazza @1161
 				},
 				error: function(error_resp){
 					displayErrors(error_resp);

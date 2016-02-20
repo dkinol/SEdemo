@@ -28,8 +28,8 @@
         <a id="nav_home" class="btn btn-primary" href="{{ url_for('index.main_route') }}">Nav Home</a>
         <a id="nav_edit" class="btn btn-primary" href="{{ url_for('user.user_edit_route') }}">Edit Account</a>
         <a id="nav_albums" class="btn btn-primary" href="{{ url_for('albums.albums_route') }}">My Albums</a>
-        <form class="form-inline" id="logout_form">
-          <button id="nav_logout" type="submit" class="btn btn-primary">Logout</button> 
+        <form id="logout_form">
+          <button id="nav_logout" type="submit">Logout</button> 
         </form>
       </div>
       <script>
@@ -45,6 +45,7 @@
                 $(location).attr('href', "{{url_for('index.main_route')}}")
             },
             error: function(error_resp){
+								displayErrors(error_resp);
                 console.log("ERROR");
             }
         });

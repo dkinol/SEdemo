@@ -90,6 +90,8 @@ def user_edit_api():
 		this_user.hash_pass()
 	extensions.update_user(this_user)
 	print 'will return now'
+        session['firstname'] = this_user.get_firstname()
+        session['lastname'] = this_user.get_lastname()
 	return user_api()
 
 @user.route('/user/edit', methods=['GET'])
