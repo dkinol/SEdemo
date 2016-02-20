@@ -59,6 +59,7 @@ function get_and_display_album(albumid){
 		},
 		error: function(error_resp){
 			displayErrors(error_resp);
+			$("#content").empty();
 		}
 	});
 }
@@ -122,6 +123,7 @@ function get_and_display_pic(inpicid){
 		},
 		error: function(error_resp){
 			displayErrors(error_resp);
+			$("#content").empty()
 		}
 	}); 
 }

@@ -2,9 +2,6 @@
 {% block body %}
 <div class="container">
   <h2 class="text-center">Edit Profile for {{ user.get_username() }}</h2>
-    {% for error in error_mess %}
-      <p class="error"> {{error}} </p>
-    {% endfor %}
 
     <form class="col-md-offset-3 col-md-3" id="update_user">
 			<input id="update_username_input" type="hidden" name="username" value="{{ user.get_username() }}">

@@ -13,12 +13,16 @@ album = Blueprint('album', __name__, template_folder='templates')
 def album_route():
 	albumname = request.args.get('id')
 	album = extensions.get_album(albumname)
+        if album == None:
+            album = Album(-1, None, None, None, None, None)
 	return render_template('album.html', album = album)
 
 @album.route('/pic', methods=['GET', 'POST'])
 def pic_route():
 	pic = request.args.get('id')
 	photo = extensions.get_photo(pic)
+        if photo == None:
+            return render_template('full_pic.html', photo = Photo(-1, None, None, None, None, None, None, None, None, None))          
 	if request.method == 'POST':
 		if 'username' in session:
 			if photo.get_username_owner() == session['username']:
@@ -28,19 +32,6 @@ def pic_route():
 					return render_template('full_pic.html', photo = photo, edit = True)
 		abort(403)
 					
-	if photo.is_private():
-		if 'username' not in session: 
-			return redirect(url_for('index.login_route') + '?url=' + url_for('album.pic_route') + '?id=' + pic)
-		elif photo.has_access(session['username']):
-			edit = (photo.get_username_owner() == session['username'])
-			return render_template('full_pic.html', photo = photo, edit = edit)
-		else:
-			abort(403)
-
-	if 'username' in session:
-		if photo.get_username_owner() == session['username']:
-			return render_template('full_pic.html', photo = photo, edit = True)
-
 	return render_template('full_pic.html', photo = photo, edit = False)
 
 @album.route('/api/v1/pic/<pic>', methods=['GET', 'PUT'])
