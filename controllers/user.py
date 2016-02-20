@@ -7,11 +7,22 @@ import re
 
 user = Blueprint('user', __name__, template_folder='templates')
 
+def get_api_user_helper(username):
+	user = extensions.get_user(username)
+	response = {}
+	response['username'] = user.get_username()
+	response['firstname'] = user.get_firstname()
+	response['lastname'] = user.get_lastname()
+	response['email'] = user.get_email()
+	return jsonify(response), 201
+
 @user.route('/api/v1/user', methods=['GET', 'POST'])
 def user_api():
 	username = ''
-	req = request.get_json(force=True)
+        print 'got to func'
+        print 'got hereereee'
 	if request.method == 'POST':
+	        req = request.get_json(force=True)
 		errors = []
 		if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
 		    errors.append('You did not provide the necessary fields')
@@ -35,15 +46,12 @@ def user_api():
 		if username == '':
 			if 'username' not in session:
 				return send_401()
-	print 'GOT HERE'
-	username = req['username']
-	user = extensions.get_user(username)
-	response = {}
-	response['username'] = user.get_username()
-	response['firstname'] = user.get_firstname()
-	response['lastname'] = user.get_lastname()
-	response['email'] = user.get_email()
-	return jsonify(response), 201
+                return get_api_user_helper(username)
+        print "GOT HERE"
+        if 'username' not in session:
+            return send_401()
+	username = session['username']
+        return get_api_user_helper(username)
 	
 
 @user.route('/user', methods=['GET'])
