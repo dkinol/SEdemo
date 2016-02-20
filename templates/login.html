@@ -34,6 +34,8 @@
                 else {
                   $(location).attr('href', "{{request.args.get('url')}}")
                 }
+                $("#login_username_input").val(""),
+                $("#login_password_input").val("")
             },
             error: function(error_resp){
                 console.log("ERROR");
