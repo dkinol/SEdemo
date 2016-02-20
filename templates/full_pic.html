@@ -6,6 +6,11 @@
 <script>
 set_pic_context("{{ photo.get_picid() }}");
 get_and_display_pic("{{ photo.get_picid() }}");
+
+{% if 'username' in session %}
+SessionUser = "{{ session['username'] }}";
+{% endif %}
+
 </script>
 </div>
 {% endblock %}
