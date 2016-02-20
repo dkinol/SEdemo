@@ -46,10 +46,12 @@
 		};
 
 		errors = [];
+		if (update_req.password1.length > 0 || update_req.password2.length > 0){
+			validatePassword(update_req.password1, update_req.password2, errors);
+		}
+		validateEmail(update_req.email, errors);
 		validateFirstname(update_req.firstname, errors);
 		validateLastname(update_req.lastname, errors);
-		validateEmail(update_req.email, errors);
-		//validatePassword(update_req.password1, update_req.password2, errors);
 		console.log(errors);
 
 		if (errors.length == 0){

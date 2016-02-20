@@ -45,6 +45,11 @@
 		};
 
 		errors = [];
+		validateUsername(user_req.username, errors);
+		validatePassword(user_req.password1, user_req.password2, errors);
+		validateEmail(user_req.email, errors);
+		validateFirstname(user_req.firstname, errors);
+		validateLastname(user_req.lastname, errors);
 		console.log(errors);
 
 		if (errors.length == 0){
@@ -62,8 +67,12 @@
 					$("#new_email_input").val("");
 					$("#new_password1_input").val("");
 					$("#new_password2_input").val("");
-
-					$(location).attr('href', "{{ url_for('index.main_route') }}")
+					{% if 'username' not in session %}
+					var redirect_url = "{{ url_for('index.login_route') }}";
+					{% else %}
+					var redirect_url = "{{ url_for('user.user_edit_route') }}";
+					{% endif %}
+					$(location).attr("href", redirect_url);
 				},
 				error: function(error_resp){
 					console.log("In error function")

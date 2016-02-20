@@ -27,19 +27,19 @@ function validateEmail(email, errors){
 }
 
 function validatePassword(password1, password2, errors){
-	if (password1 !== password2){
-		errors.push("Passwords do not match");
+	if (password1.length < 8){
+		errors.push("Passwords must be at least 8 characters long");
 	}
-	var re = /^[A-Za-z0-9_]*$/;
-	if (re.test(password1) == false){
-		errors.push("Passwords may only contain letters, digits, and underscores");
-	}
-	re = /^(?=.*[a-zA-Z])(?=.*\d).+$/;
+	var re = /^(?=.*[a-zA-Z])(?=.*\d).+$/;
 	if (re.test(password1) == false){
 		errors.push("Passwords must contain at least one letter and one number");
 	}
-	if (password1.length < 8){
-		errors.push("Passwords must be at least 8 characters long");
+	re = /^[A-Za-z0-9_]*$/;
+	if (re.test(password1) == false){
+		errors.push("Passwords may only contain letters, digits, and underscores");
+	}
+	if (password1 !== password2){
+		errors.push("Passwords do not match");
 	}
 }
 
@@ -56,12 +56,12 @@ function validateLastname(lastname, errors){
 }
 
 function validateUsername(username, errors){
+	if (username.length < 3){
+		errors.push("Usernames must be at least 3 characters long");
+	}
 	var re = /^[A-Za-z0-9_]*$/;
 	if (re.test(username) == false){
 		errors.push("Usernames may only contain letters, digits, and underscores");
-	}
-	if (username.length < 3){
-		errors.push("Usernames must be at least 3 characters long");
 	}
 	if (username.length > 20){
 		errors.push("Username must be no longer than 20 characters");
