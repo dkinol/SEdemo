@@ -115,6 +115,9 @@ function displayPicture(photo){
 
 // Function gets picture from server then displays it
 function get_and_display_pic(inpicid){
+	if (inpicid == 'null'){
+		return;
+	}
 	$.ajax({
 		url: pic_api_route(inpicid), 
 		type: "GET", 
