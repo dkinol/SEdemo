@@ -27,11 +27,6 @@
     </form>
 </div>
 
-<div class="container">
-	<ul id="error_list">
-	</ul>
-</div>
-
 <script>
 	$("#update_user").submit(function(event){
 		// Prevents the form from submitting normally
@@ -75,13 +70,7 @@
 					$("#update_password2_input").val("");
 				},
 				error: function(error_resp){
-					var result = JSON.parse(error_resp.responseText);
-					var server_err = [];
-					if ('errors' in result){
-						for (i = 0; i < result.errors.length; ++i){
-							server_err.push(result.errors[i].message);
-						}
-						printErrors(server_err);
+						displayErrors(error_resp);
 					}
 				}
 			});
