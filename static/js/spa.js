@@ -49,8 +49,10 @@ function get_and_display_album(albumid){
 		success: function(result){
 			var Album = result;
 			if (save_state){
+				console.log("Save album state");
 				var app_state = new AppState('album', albumid);
 				history.pushState(app_state, "", album_template_route(AlbumId));
+				console.log(app_state);
 			}
 			displayAlbum(Album);
 			save_state = true;
@@ -107,7 +109,9 @@ function get_and_display_pic(inpicid){
 		success: function(result) {
 			PicModel = result; 
 			if (save_state === true){
+				console.log("Save pic state");
 				var app_state = new AppState("pic", PicModel.picid);
+				console.log(app_state);
 				history.pushState(app_state, "", pic_template_route(PicModel.picid));
 			}
 			displayPicture(PicModel); 
@@ -118,13 +122,17 @@ function get_and_display_pic(inpicid){
 
 window.onpopstate = function(event){
 	save_state = false;
-	if (event.state.type == 'album'){
-		set_album_context(event.state.id);
-		get_and_display_album(event.state.id);
-	}
-	else{
-		set_pic_context(event.state.id);
-		get_and_display_pic(event.state.id);
+	if ('state' in event){
+		if (event.state != null){
+			if (event.state.type == 'album'){
+				set_album_context(event.state.id);
+				get_and_display_album(event.state.id);
+			}
+			else if (event.state.type == 'pic'){
+				set_pic_context(event.state.id);
+				get_and_display_pic(event.state.id);
+			}
+		}
 	}
 }
 

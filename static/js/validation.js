@@ -2,6 +2,19 @@ function getSecret(){
 	return "";
 }
 
+function displayErrors(errors){
+		var result = JSON.parse(errors.responseText);
+		var server_err = [];
+		if ('errors' in result){
+			for (i = 0; i < result.errors.length; ++i){
+				server_err.push(result.errors[i].message);
+			}
+		}
+	for (i = 0; i < server_err; ++i){
+		$("#error_list").append("<li><p class=error>" + server_err[i] + "</p></li>");
+	}
+}
+
 function validateEmail(email, errors){
 	var re = /[^@]+@[^@]+\.[^@]+/;
 	if (re.test(email) == false){
@@ -14,7 +27,7 @@ function validateEmail(email, errors){
 
 function validatePassword(password1, password2, errors){
 	if (password1 !== password2){
-		errors.push("Passwords must match");
+		errors.push("Passwords do not match");
 	}
 	var re = /^[A-Za-z0-9_]*$/;
 	if (re.test(password1) == false){
