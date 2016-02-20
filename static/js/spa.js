@@ -103,13 +103,9 @@ function displayPicture(photo){
 	$("#content").empty();
 	$("#content").append(full_pic_template(static_image_route(photo.picid, photo.format)));
 	$("#content").append(comment_template("pic_"+photo.picid+"_caption", photo.caption));
-	if (photo.prev != ""){
-		$("#content").append(prev_pic_template(pic_template_route(photo.prev), photo.prev));
-	}
+	$("#content").append(prev_pic_template(pic_template_route(photo.prev), photo.prev));
 	$("#content").append(parent_album_template(album_template_route(photo.albumid)));
-	if (photo.next != "") {
-		$("#content").append(next_pic_template(pic_template_route(photo.next), photo.next)); 
-	}
+	$("#content").append(next_pic_template(pic_template_route(photo.next), photo.next)); 
 }
 
 function display_pic_helper(){
@@ -123,7 +119,7 @@ function display_pic_helper(){
 
 // Function gets picture from server then displays it
 function get_and_display_pic(inpicid){
-	if (inpicid == 'null'){
+	if (inpicid == '0'){
 		return;
 	}
 	$.ajax({
@@ -131,6 +127,12 @@ function get_and_display_pic(inpicid){
 		type: "GET", 
 		success: function(result) {
 			PicModel = result; 
+			if (result.next == null){
+				PicModel.next = '0';
+			}
+			if (result.prev == null){
+				PicModel.prev = '0';
+			}
 			$.ajax({
 				url: album_api_route(result.albumid),
 				type: "GET",
