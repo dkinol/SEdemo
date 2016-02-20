@@ -31,6 +31,11 @@ football = [f for f in glob.glob('static/images/safe/football*.jpg')]
 worlds = [f for f in glob.glob('static/images/safe/world*.jpg')]
 space = [f for f in glob.glob('static/images/safe/space*.jpg')]
 
+sports = sorted(sports, key=lambda s: s.lower())
+football = sorted(worlds, key=lambda s: s.lower()) 
+worlds = sorted(worlds, key=lambda s: s.lower())
+space = sorted(worlds, key=lambda s: s.lower()) 
+
 allpics = [[sports, 'sportslover', 'I love sports'], 
 	[football, 'sportslover', 'I love football'] , 
 	[worlds, 'traveler', 'Around The World'],
@@ -39,7 +44,7 @@ allpics = [[sports, 'sportslover', 'I love sports'],
 for i in range(len(allpics)):
 	for num in range(len(allpics[i][0])):
 		pic = string.replace(allpics[i][0][num], 'static/images/safe/', '')
-		photo = Photo(pic, '.jpg', None, i, None, None, None)
+		photo = Photo(pic, '.jpg', None, i, None, None, None, None, None, None)
 		photo.hash(pic, allpics[i][1], allpics[i][2])
 		sql.write('INSERT INTO Photo\n')
 		sql.write('VALUES (\"' + photo.get_picid() + '\", \"jpg\", \"2016-01-01\");\n')
