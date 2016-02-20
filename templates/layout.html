@@ -45,6 +45,7 @@
                 $(location).attr('href', "{{url_for('index.main_route')}}")
             },
             error: function(error_resp){
+								displayErrors(error_resp);
                 console.log("ERROR");
             }
         });
