@@ -4,7 +4,10 @@ function AppState(intype, inid){
 	this.id = inid;
 }
 
+var SessionUser = "";
 var AlbumId = -1;
+var CanEdit = false;
+
 // Sets the basic page contents for an album
 function set_album_context(albumid){
 		$("#content").empty();
@@ -79,6 +82,11 @@ function full_pic_template(src){
 	return '<img src="'+src+'" style="width:100%;height=100%;" alt="" />'; 
 }
 function comment_template(pic_id, pic_comment){
+	if (CanEdit){
+		return'<form class="col-md-offset-3 col-md-3">' +
+		'<input type="text" class="form-control" value="' + PicModel.caption + '" id="pic_caption_input">' +
+		'</form>';
+	}
 	return '<p class="text-center" id="'+pic_id+'" >'+pic_comment+'</p>'; 
 }
 function prev_pic_template(pic_url, picid){
@@ -112,14 +120,27 @@ function get_and_display_pic(inpicid){
 		type: "GET", 
 		success: function(result) {
 			PicModel = result; 
-			if (save_state === true){
-				console.log("Save pic state");
-				var app_state = new AppState("pic", PicModel.picid);
-				console.log(app_state);
-				history.pushState(app_state, "", pic_template_route(PicModel.picid));
-			}
-			displayPicture(PicModel); 
-			save_state = true;
+			$.ajax({
+				url: album_api_route(result.albumid),
+				type: "GET",
+				success: function (result){
+					var album = result;
+					if (album.username == SessionUser){
+						CanEdit = true;
+					}
+					else{
+						CanEdit = false;
+					}
+					if (save_state === true){
+						console.log("Save pic state");
+						var app_state = new AppState("pic", PicModel.picid);
+						console.log(app_state);
+						history.pushState(app_state, "", pic_template_route(PicModel.picid));
+					}
+					displayPicture(PicModel); 
+					save_state = true;
+				}
+			});
 		},
 		error: function(error_resp){
 			displayErrors(error_resp);
@@ -144,6 +165,29 @@ window.onpopstate = function(event){
 	}
 }
 
+$('body').on("keypress", "#pic_caption_input", function(event){
+	if (event.which == 13){
+		event.preventDefault();
+		console.log("Got to the func");
+		PicModel.caption = $("#pic_caption_input").val();
+		console.log(PicModel);
+		$.ajax({
+			url: pic_api_route(PicModel.picid),
+			type: 'PUT',
+			contentType: "application/json",
+			data: JSON.stringify(PicModel),
+			success: function(response){
+				console.log(response);
+				//$("#pic_caption_input").val("");
+				//$('#pic_' + PicModel.picid + '_caption').val(PicModel.caption);
+			},
+			error: function(error_resp){
+				console.log("ERROR");
+				//displayErrors(error_resp);
+			}
+		});
+	}
+});
 // Album page, when clicked it loads a picture
 $('body').on('click', "a[id^='pic_']", function(event){
 		// Prevents the user from following the link
@@ -178,25 +222,4 @@ $('body').on('click', "#parent_album", function(event){
 	//history.pushState(app_state, "", pic_template_route(PicModel.picid));
 	set_album_context();
 	get_and_display_album(PicModel.albumid);
-});
-
-// Controller function for editing caption
-$("#new_cap").submit(function(event){
-	// Prevents the form from submitting normally
-	event.preventDefault();
-	PicModel.caption = $("#pic_caption_input").val();
-	$.ajax({
-		url: pic_api_route(PicModel.picid),
-		type: 'PUT',
-		contentType: "application/json",
-		data: JSON.stringify(PicModel),
-		success: function(response){
-			console.log(response);
-			$("#pic_caption_input").val("");
-			$('#pic_' + PicModel.picid + '_caption').val(PicModel.caption);
-		},
-		error: function(error_resp){
-			displayErrors(error_resp);
-		}
-	});
 });
