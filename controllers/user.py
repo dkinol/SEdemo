@@ -13,16 +13,15 @@ def user_api():
 	if request.method == 'POST':
 		errors = []
 		req = request.get_json(force=True)
-                if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
-                        errors.append('You did not provide the necessary fields')
-                        return jsonify(generate_error_response(errors)), 422
+		if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
+		    errors.append('You did not provide the necessary fields')
+		    return jsonify(generate_error_response(errors)), 422
+		if (req['username'] == '') or (req['email'] == '') or (req['password1'] == '') or (req['password2'] == ''):
+		    errors.append('You did not provide the necessary fields')
+		    return jsonify(generate_error_response(errors)), 422
 		if req['password1'] != req['password2']:
 			errors.append('Passwords do not match')
-		user = User(req['username'],
-			req['firstname'],
-			req['lastname'],
-			req['password1'],
-			req['email'])
+		user = User(req['username'], req['firstname'], req['lastname'], req['password1'], req['email'])
 		errors = errors + user.validate()
 		temp_user = extensions.get_user(req['username'])
 		if temp_user != None:
@@ -33,10 +32,9 @@ def user_api():
 		user.hash_pass()
 		extensions.add_user(user)
 		username = req['username']
-	if username == '':
-		if 'username' not in session:
-                        return send_401()
-		username = session['username']
+		if username == '':
+			if 'username' not in session:
+				return send_401()
 	user = extensions.get_user(username)
 	response = {}
 	response['username'] = user.get_username()
@@ -62,6 +60,9 @@ def user_edit_api():
 	if ('username' not in req) or ('firstname' not in req) or ('lastname' not in req) or ('email' not in req) or ('password1' not in req) or ('password2' not in req):
             errors.append('You did not provide the necessary fields')
             return jsonify(generate_error_response(errors)), 422
+	if (req['username'] == '') or (req['email'] == '') or (req['password1'] == '') or (req['password2'] == ''):
+	        errors.append('You did not provide the necessary fields')
+	        return jsonify(generate_error_response(errors)), 422
 	errors = []
 	if req['password1'] != req['password2']:
 		errors.append('Passwords do not match')
