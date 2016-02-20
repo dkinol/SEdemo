@@ -32,7 +32,12 @@
                 console.log("success function");
                 $("#login_username_input").val(""),
                 $("#login_password_input").val("")
-                $(location).attr('href', "{{request.args.get('url')}}")
+                if ("{{request.args.get('url')}}" == "None"){
+                  $(location).attr('href', "{{ url_for('index.main_route') }}")
+                }
+                else {
+                  $(location).attr('href', "{{request.args.get('url')}}")
+                }
             },
             error: function(error_resp){
                 console.log("ERROR");
