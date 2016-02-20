@@ -3,14 +3,15 @@ function getSecret(){
 }
 
 function displayErrors(errors){
-		var result = JSON.parse(errors.responseText);
-		var server_err = [];
-		if ('errors' in result){
-			for (i = 0; i < result.errors.length; ++i){
-				server_err.push(result.errors[i].message);
-			}
+	var result = JSON.parse(errors.responseText);
+	var server_err = [];
+	if ('errors' in result){
+		for (i = 0; i < result.errors.length; ++i){
+			server_err.push(result.errors[i].message);
 		}
-	for (i = 0; i < server_err; ++i){
+	}
+	$("#error_list").empty();
+	for (i = 0; i < server_err.length; ++i){
 		$("#error_list").append("<li><p class=error>" + server_err[i] + "</p></li>");
 	}
 }

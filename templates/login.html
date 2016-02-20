@@ -7,11 +7,7 @@
     <input id="login_password_input" type="password" name="password" class="form-control" placeholder="Password" />
     <button id="login_submit" type="submit" class="btn btn-primary col-md-offset-2"> Login </button> 
   </form>
-  {% if error == 'Invalid username' %}
-  <p class="error" id="error_username">Username does not exist</p>
-  {% elif error == 'Invalid password'%}
-  <p class="error" id="error_combo">Incorrect password</p>
-  {% endif %}
+  
 </div>
 
 <script>
@@ -41,6 +37,7 @@
             },
             error: function(error_resp){
                 console.log("ERROR");
+                displayErrors(error_resp);
             }
         });
     });
