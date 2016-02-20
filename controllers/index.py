@@ -23,12 +23,14 @@ def login_api():
 	print 'Api login'
 	req = request.get_json(force=True)
 	errors = []
+	if (req['username'] == '') or (req['password'] == ''):
+		errors.append("You did not provide the necessary fields")
+		return jsonify(generate_error_response(errors)), 422
 	if ('username' not in req) or ('password' not in req):
 		errors.append("You did not provide the necessary fields")
 		return jsonify(generate_error_response(errors)), 422
 	user = extensions.get_user(req['username'])
 	if user == None:
-		
 		errors.append("Username does not exist")
 		return jsonify(generate_error_response(errors)), 404
 	user_pass = req['password']

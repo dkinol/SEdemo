@@ -45,11 +45,6 @@
 		};
 
 		errors = [];
-		validateUsername(user_req.username, errors);
-		validateFirstname(user_req.firstname, errors);
-		validateLastname(user_req.lastname, errors);
-		validateEmail(user_req.email, errors);
-		validatePassword(user_req.password1, user_req.password2, errors);
 		console.log(errors);
 
 		if (errors.length == 0){
@@ -69,7 +64,9 @@
 					$("#new_password2_input").val("");
 				},
 				error: function(error_resp){
+					console.log("In error function")
 					displayErrors(error_resp);
+					console.log("out of displayErrors")
 				}
 			});
 		}

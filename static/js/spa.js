@@ -56,6 +56,9 @@ function get_and_display_album(albumid){
 			}
 			displayAlbum(Album);
 			save_state = true;
+		},
+		error: function(error_resp){
+			displayErrors(error_resp);
 		}
 	});
 }
@@ -116,6 +119,9 @@ function get_and_display_pic(inpicid){
 			}
 			displayPicture(PicModel); 
 			save_state = true;
+		},
+		error: function(error_resp){
+			displayErrors(error_resp);
 		}
 	}); 
 }
@@ -187,8 +193,8 @@ $("#new_cap").submit(function(event){
 			$("#pic_caption_input").val("");
 			$('#pic_' + PicModel.picid + '_caption').val(PicModel.caption);
 		},
-		error: function(e){
-			console.log(e.message);
+		error: function(error_resp){
+			displayErrors(error_resp);
 		}
 	});
 });
