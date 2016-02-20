@@ -32,9 +32,9 @@ worlds = [f for f in glob.glob('static/images/safe/world*.jpg')]
 space = [f for f in glob.glob('static/images/safe/space*.jpg')]
 
 sports = sorted(sports, key=lambda s: s.lower())
-football = sorted(worlds, key=lambda s: s.lower()) 
+football = sorted(football, key=lambda s: s.lower()) 
 worlds = sorted(worlds, key=lambda s: s.lower())
-space = sorted(worlds, key=lambda s: s.lower()) 
+space = sorted(space, key=lambda s: s.lower()) 
 
 allpics = [[sports, 'sportslover', 'I love sports'], 
 	[football, 'sportslover', 'I love football'] , 
