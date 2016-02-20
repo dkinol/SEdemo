@@ -40,7 +40,7 @@ def login_api():
 		session['lastname'] = user.get_lastname()
 		result = {}
 		result['username'] = user.get_username()
-		return jsonify(result), 201
+		return jsonify(result), 200
 	errors.append("Password is incorrect for the specified username")
 	return jsonify(generate_error_response(errors)), 422
 
@@ -51,7 +51,7 @@ def login_route():
 @index.route('/api/v1/logout', methods=['POST'])
 def logout_api():
 	if 'username' not in session:
-		send_401()
+		return send_401()
 	session.pop('username', None)
 	session.pop('firstname', None)
 	session.pop('lastname', None)
