@@ -57,7 +57,7 @@ def logout_api():
 	session.pop('lastname', None)
 	return ('', 204)
 	
-'''
+
 @index.route('/logout', methods=['POST'])
 def logout_route():
 	print 'got to logout'
@@ -66,4 +66,7 @@ def logout_route():
 		session.pop('firstname', None)
 		session.pop('lastname', None)
 		return redirect(url_for('index.main_route'))
-'''
+
+@index.route('/live')
+def live_route():
+	return send_file('static/html/live.html')

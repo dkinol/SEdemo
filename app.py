@@ -22,6 +22,7 @@ app.register_blueprint(controllers.index)
 app.register_blueprint(controllers.album)
 app.register_blueprint(controllers.albums)
 app.register_blueprint(controllers.user)
+app.register_blueprint(controllers.api)
 
 # Start server
 if __name__ == '__main__':
