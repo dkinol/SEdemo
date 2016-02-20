@@ -76,7 +76,7 @@ def user_edit_api():
 	this_user.create_salt()
 	this_user.hash_pass()
 	extensions.update_user(this_user)
-	return user_api(), 201
+	return user_api(), 200
 
 @user.route('/user/edit', methods=['GET'])
 def user_edit_route():
